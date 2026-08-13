@@ -1,41 +1,72 @@
-/**
- * Below are the colors that are used in the app. The colors are defined in the light and dark mode.
- * There are many other ways to style your app. For example, [Nativewind](https://www.nativewind.dev/), [Tamagui](https://tamagui.dev/), [unistyles](https://reactnativeunistyles.vercel.app), etc.
- */
-
 import { Platform } from 'react-native';
 
-const tintColorLight = '#0a7ea4';
-const tintColorDark = '#fff';
+export const brand = {
+  50: '#f4fae6',
+  100: '#e6f5cc',
+  200: '#c2ea80',
+  300: '#a5e140',
+  400: '#9ae800',
+  500: '#8CD400', // Primary brand color
+  600: '#7ab800',
+  700: '#659900',
+  800: '#4c7300',
+  900: '#334d00',
+  950: '#1a2600',
+} as const;
 
 export const Colors = {
   light: {
-    text: '#11181C',
-    background: '#fff',
-    tint: tintColorLight,
-    icon: '#687076',
-    tabIconDefault: '#687076',
-    tabIconSelected: tintColorLight,
+    background: '#ffffff',
+    surface: '#f4f4f5',
+    card: '#ffffff',
+    cardBorder: '#e4e4e7',
+    text: '#09090b',
+    textMuted: '#71717a',
+    textSubtle: '#a1a1aa',
+    primary: brand[500],
+    primaryFg: brand[950],
+    primaryMuted: 'rgba(140, 212, 0, 0.1)',
+    primaryBorder: 'rgba(140, 212, 0, 0.2)',
+    accent: '#a855f7',
+    online: '#10b981',
+    tabActive: brand[500],
+    tabInactive: '#a1a1aa',
+    tabBar: '#ffffff',
+    tabBorder: '#e4e4e7',
+    divider: '#e4e4e7',
+    icon: '#71717a',
   },
   dark: {
-    text: '#ECEDEE',
-    background: '#151718',
-    tint: tintColorDark,
-    icon: '#9BA1A6',
-    tabIconDefault: '#9BA1A6',
-    tabIconSelected: tintColorDark,
+    background: '#050505',
+    surface: '#0a0a0a',
+    card: '#121212',
+    cardBorder: '#27272a',
+    text: '#ffffff',
+    textMuted: '#71717a',
+    textSubtle: '#52525b',
+    primary: brand[500],
+    primaryFg: brand[950],
+    primaryMuted: 'rgba(140, 212, 0, 0.1)',
+    primaryBorder: 'rgba(140, 212, 0, 0.2)',
+    primaryMutedOpaque: 'rgba(140, 212, 0, 0.8)',
+    accent: '#a855f7',
+    online: '#10b981',
+    tabActive: brand[500],
+    tabInactive: '#52525b',
+    tabBar: '#09090b',
+    tabBorder: '#27272a',
+    divider: 'rgba(39, 39, 42, 0.6)',
+    icon: '#71717a',
   },
-};
+} as const;
+
+export type ColorScheme = keyof typeof Colors;
 
 export const Fonts = Platform.select({
   ios: {
-    /** iOS `UIFontDescriptorSystemDesignDefault` */
     sans: 'system-ui',
-    /** iOS `UIFontDescriptorSystemDesignSerif` */
     serif: 'ui-serif',
-    /** iOS `UIFontDescriptorSystemDesignRounded` */
     rounded: 'ui-rounded',
-    /** iOS `UIFontDescriptorSystemDesignMonospaced` */
     mono: 'ui-monospace',
   },
   default: {
@@ -44,10 +75,35 @@ export const Fonts = Platform.select({
     rounded: 'normal',
     mono: 'monospace',
   },
-  web: {
-    sans: "system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif",
-    serif: "Georgia, 'Times New Roman', serif",
-    rounded: "'SF Pro Rounded', 'Hiragino Maru Gothic ProN', Meiryo, 'MS PGothic', sans-serif",
-    mono: "SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace",
-  },
 });
+
+export const Spacing = {
+  xs: 4,
+  sm: 8,
+  md: 12,
+  lg: 16,
+  xl: 20,
+  '2xl': 24,
+  '3xl': 28,
+  '4xl': 32,
+} as const;
+
+export const Radius = {
+  sm: 8,
+  md: 10,
+  lg: 16,
+  xl: 20,
+  full: 999,
+} as const;
+
+export const Typography = {
+  h1: { fontSize: 28, fontWeight: '700', letterSpacing: -0.5 },
+  h2: { fontSize: 22, fontWeight: '700', letterSpacing: -0.3 },
+  h3: { fontSize: 18, fontWeight: '500', letterSpacing: -0.2 },
+  section: { fontSize: 15, fontWeight: '600', letterSpacing: -0.3 },
+  body: { fontSize: 13, lineHeight: 20 },
+  small: { fontSize: 11, lineHeight: 16 },
+  badge: { fontSize: 11, fontWeight: '700' },
+  button: { fontSize: 14, fontWeight: '600' },
+  label: { fontSize: 12, fontWeight: '500' },
+} as const;
