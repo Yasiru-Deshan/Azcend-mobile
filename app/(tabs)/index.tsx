@@ -1,6 +1,7 @@
 import React from 'react';
 import { ScrollView, View, StatusBar, StyleSheet } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useRouter } from 'expo-router';
 
 import { DashboardGreeting } from '@/src/features/dashboard/components/DashboardGreeting';
 import { TodayWorkoutCard } from '@/src/features/dashboard/components/TodayWorkoutCard';
@@ -23,6 +24,8 @@ export default function HomeScreen() {
     startDayWorkout,
     workoutStarted,
   } = useWorkoutStore();
+
+  const router = useRouter();
 
   const todaysWorkout = {
     title: currentTemplate.days[0]?.name ?? 'Upper Body Strength',
@@ -56,7 +59,7 @@ export default function HomeScreen() {
             }}
           />
 
-          <WeeklyCheckinCard onSubmit={() => {}} />
+          <WeeklyCheckinCard onSubmit={() => router.push('/weekly-checkin/post')} />
 
           <WeeklyStatsCards
             workouts={completedWorkoutsCount}
