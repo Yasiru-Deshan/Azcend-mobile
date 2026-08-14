@@ -15,14 +15,12 @@ const C = Colors.dark;
 
 export default function ProfileTabScreen() {
   const router = useRouter();
-  const { profile, fetchProfile, isAuthenticated, logout } = useAuthStore();
+  const { profile, isAuthenticated, logout } = useAuthStore();
 
   useEffect(() => {
     if (!isAuthenticated) {
       router.replace('/login');
-      return;
     }
-    fetchProfile();
   }, [isAuthenticated]);
 
   const handleLogout = async () => {

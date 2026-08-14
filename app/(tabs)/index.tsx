@@ -1,21 +1,23 @@
-import React from 'react';
-import { ScrollView, View, StatusBar, StyleSheet } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
+import React from 'react';
+import { ScrollView, StatusBar, StyleSheet, View } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
+import { Colors, Spacing } from '@/constants/theme';
+import { DailyTipCard } from '@/src/features/dashboard/components/DailyTipCard';
 import { DashboardGreeting } from '@/src/features/dashboard/components/DashboardGreeting';
 import { TodayWorkoutCard } from '@/src/features/dashboard/components/TodayWorkoutCard';
+import { UpNextCard } from '@/src/features/dashboard/components/UpNextCard';
 import { WeeklyCheckinCard } from '@/src/features/dashboard/components/WeeklyCheckinCard';
 import { WeeklyStatsCards } from '@/src/features/dashboard/components/WeeklyStatsCards';
-import { UpNextCard } from '@/src/features/dashboard/components/UpNextCard';
-import { DailyTipCard } from '@/src/features/dashboard/components/DailyTipCard';
+import { useAuthStore } from '@/src/store/auth.store';
 import { useWorkoutStore } from '@/src/store/workout.store';
-import { Colors, Spacing } from '@/constants/theme';
 
 const C = Colors.dark;
 
 export default function HomeScreen() {
-  const clientName = 'Alex';
+  const { profile, coach } = useAuthStore();
+  const clientName = profile?.name || 'Client';
 
   const {
     completedWorkoutsCount,
@@ -45,7 +47,11 @@ export default function HomeScreen() {
         contentContainerStyle={styles.content}
         showsVerticalScrollIndicator={false}
       >
-        <DashboardGreeting clientName={clientName} />
+        <DashboardGreeting
+          clientName={clientName}
+          coachName={coach?.name}
+          coachAvatarUrl={coach?.avatarUrl}
+        />
 
         <View style={styles.cardStack}>
           <TodayWorkoutCard
@@ -69,7 +75,7 @@ export default function HomeScreen() {
           <UpNextCard
             title={upNext.title}
             subtitle={upNext.subtitle}
-            onClick={() => {}}
+            onClick={() => { }}
           />
 
           <DailyTipCard

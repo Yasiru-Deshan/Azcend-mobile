@@ -1,5 +1,7 @@
 import { create } from 'zustand';
+import type { UserProfile } from '../features/profile/types';
 import { loginApi, logoutApi } from '../services/auth.service';
+import { fetchUserProfileApi } from '../services/user.service';
 
 export interface User {
   id: string;
@@ -8,15 +10,25 @@ export interface User {
   role?: string;
 }
 
+export interface CoachInfo {
+  id: string;
+  name: string;
+  avatarUrl?: string;
+  isOnline?: boolean;
+}
+
 interface AuthState {
   isAuthenticated: boolean;
   token: string | null;
   user: User | null;
+  profile: UserProfile | null;
+  coach: CoachInfo | null;
   isLoading: boolean;
   error: string | null;
 
   login: (email: string, password?: string) => Promise<boolean>;
   logout: () => Promise<void>;
+  fetchProfile: () => Promise<void>;
   clearError: () => void;
 }
 
@@ -24,6 +36,8 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   isAuthenticated: false,
   token: null,
   user: null,
+  profile: null,
+  coach: null,
   isLoading: false,
   error: null,
 
@@ -49,10 +63,12 @@ export const useAuthStore = create<AuthState>((set, get) => ({
           isLoading: false,
           error: null,
         });
+
+        get().fetchProfile();
         return true;
       }
 
-      if (response.error && response.status > 0) {
+      if (response.error) {
         set({
           isLoading: false,
           error: response.error,
@@ -60,20 +76,11 @@ export const useAuthStore = create<AuthState>((set, get) => ({
         return false;
       }
 
-      console.warn('Server offline/unreachable. Falling back to dev mock login.');
       set({
-        isAuthenticated: true,
-        token: 'dev-mock-token-123',
-        user: {
-          id: 'client-alex',
-          email: email || 'alex@azcend.com',
-          name: 'Alex',
-          role: 'client',
-        },
         isLoading: false,
-        error: null,
+        error: 'Network request failed. Please check your connection.',
       });
-      return true;
+      return false;
     } catch (err: any) {
       set({
         isLoading: false,
@@ -83,15 +90,55 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     }
   },
 
+  fetchProfile: async () => {
+    const { token, logout } = get();
+    if (!token) {
+      await logout();
+      return;
+    }
+
+    const res = await fetchUserProfileApi(token);
+    if (res.data) {
+      const p = res.data;
+      const coachObj = p.coach || p.assignedCoach;
+      const coachData: CoachInfo | null = coachObj
+        ? {
+          id: coachObj.id,
+          name: `${coachObj.firstName || ''} ${coachObj.lastName || ''}`.trim() || coachObj.name,
+          avatarUrl: coachObj.avatarUrl,
+          isOnline: true,
+        }
+        : null;
+
+      const clientName = `${p.firstName || ''} ${p.lastName || ''}`.trim() || p.name || (p.email ? p.email.split('@')[0] : 'User');
+
+      set({
+        profile: {
+          id: p.id || p.userId || '',
+          name: clientName,
+          email: p.email || '',
+          mobile: p.mobile || p.phone || '',
+          avatarUrl: p.avatarUrl || '',
+          subscription: p.subscriptionName || 'Free',
+          joinedAt: p.joinedDate || p.joinedAt || p.createdAt || new Date().toISOString(),
+        },
+        coach: coachData,
+      });
+    } else {
+      await logout();
+    }
+  },
+
   logout: async () => {
     const { token } = get();
-    if (token && token !== 'dev-mock-token-123') {
+    if (token) {
       await logoutApi(token).catch(() => null);
     }
     set({
       isAuthenticated: false,
       token: null,
       user: null,
+      profile: null,
       error: null,
     });
   },
