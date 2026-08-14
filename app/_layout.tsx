@@ -17,6 +17,8 @@ export default function RootLayout() {
       <Stack>
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
         <Stack.Screen name="modal" options={{ presentation: 'modal', title: 'Modal' }} />
+        <Stack.Screen name="workouts/history" options={{ title: 'Workout History', headerBackTitle: 'Back' }} />
+        <Stack.Screen name="workouts/templates/[id]" options={{ title: 'Program Details', headerBackTitle: 'Back' }} />
       </Stack>
       <StatusBar style="auto" />
     </ThemeProvider>

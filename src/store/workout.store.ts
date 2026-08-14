@@ -105,7 +105,79 @@ const MOCK_CURRENT_TEMPLATE: WorkoutTemplate = {
   ],
 };
 
-const MOCK_HISTORY_TEMPLATES: WorkoutTemplate[] = [];
+const MOCK_HISTORY_TEMPLATES: WorkoutTemplate[] = [
+  {
+    id: 'fat-loss-phase',
+    goalId: 'weight-loss',
+    name: 'Fat Loss Phase',
+    description: 'A beginner calorie-burning plan designed to shed body fat while preserving lean muscle mass. Focused on high repetitions and short rest intervals.',
+    difficulty: 'Beginner',
+    durationMinutes: 35,
+    days: [
+      {
+        id: 'fl-day-1',
+        name: 'Day 1: Full Body HIIT',
+        exercises: [
+          {
+            id: 'kettlebell-swings',
+            name: 'Kettlebell Swings',
+            sets: 3,
+            reps: '20 reps',
+            restSeconds: 30,
+            weightMode: 'LWHR',
+            instructions: 'Stand with feet shoulder-width apart. Swing the kettlebell back between your legs, then drive your hips forward to swing the kettlebell to eye level. Keep core tight.',
+            videoUrl: 'https://assets.mixkit.co/videos/preview/mixkit-athlete-man-performing-biceps-curl-with-dumbbells-41855-large.mp4',
+            imageUrl: 'https://images.unsplash.com/photo-1581009146145-b5ef050c2e1e?q=80&w=800&auto=format&fit=crop',
+          },
+        ],
+      },
+      {
+        id: 'fl-day-2',
+        name: 'Day 2: Core & Abs Recovery',
+        exercises: [
+          {
+            id: 'bicycle-crunches',
+            name: 'Bicycle Crunches',
+            sets: 3,
+            reps: '20 reps',
+            restSeconds: 30,
+            weightMode: 'LWHR',
+            instructions: 'Lie on your back with legs up. Alternate touching opposite elbow to opposite knee in a bicycle motion.',
+            videoUrl: 'https://assets.mixkit.co/videos/preview/mixkit-young-man-exercising-in-a-fitness-center-40234-large.mp4',
+            imageUrl: 'https://images.unsplash.com/photo-1541534741688-6078c6bfb5c5?q=80&w=800&auto=format&fit=crop',
+          },
+        ],
+      },
+    ],
+  },
+  {
+    id: 'strength-builder',
+    goalId: 'strength',
+    name: 'Strength Builder',
+    description: 'An advanced strength-building program based on low repetition, high weight compound lifting. Enhances absolute strength and power output.',
+    difficulty: 'Advanced',
+    durationMinutes: 60,
+    days: [
+      {
+        id: 'str-day-1',
+        name: 'Day 1: Deadlift Focus',
+        exercises: [
+          {
+            id: 'deadlifts',
+            name: 'Conventional Barbell Deadlifts',
+            sets: 5,
+            reps: '5 reps',
+            restSeconds: 180,
+            weightMode: 'HWLR',
+            instructions: 'Hinge at the hips and grip the barbell. Pull up in a vertical line by pushing the floor away, locking out at the hips. Keep your back straight throughout.',
+            videoUrl: 'https://assets.mixkit.co/videos/preview/mixkit-man-training-in-a-gym-with-barbell-bench-press-40242-large.mp4',
+            imageUrl: 'https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?q=80&w=800&auto=format&fit=crop',
+          },
+        ],
+      },
+    ],
+  },
+];
 
 export const useWorkoutStore = create<WorkoutState>()(
   persist(
@@ -234,7 +306,7 @@ export const useWorkoutStore = create<WorkoutState>()(
       },
     }),
     {
-      name: 'ascend-workout-v2-storage',
+      name: 'ascend-workout-v3-storage',
       storage: createJSONStorage(() => AsyncStorage),
       partialize: (state) => ({
         currentTemplate: state.currentTemplate,
