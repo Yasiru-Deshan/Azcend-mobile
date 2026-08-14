@@ -9,13 +9,17 @@ import React from 'react';
 import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+import { useAuthStore } from '@/src/store/auth.store';
+
 const C = Colors.dark;
 
 export default function ProfileTabScreen() {
   const router = useRouter();
+  const logout = useAuthStore((state) => state.logout);
 
-  const handleLogout = () => {
-    console.log('Logging out...');
+  const handleLogout = async () => {
+    await logout();
+    router.replace('/login');
   };
 
   return (
