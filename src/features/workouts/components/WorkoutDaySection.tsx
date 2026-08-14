@@ -54,7 +54,7 @@ export const WorkoutDaySection = ({
               onPress={onStartWorkout}
               activeOpacity={0.85}
             >
-              <Play size={13} color={C.primaryFg} fill={C.primaryFg} />
+              <Play size={16} color={C.primaryFg} fill={C.primaryFg} />
               <Text style={styles.startButtonText}>Start Day Routine</Text>
             </TouchableOpacity>
           )}
@@ -73,6 +73,6 @@ const styles = StyleSheet.create({
   expandedContent: { paddingHorizontal: Spacing.lg, paddingBottom: Spacing.lg },
   divider: { height: 1, backgroundColor: C.divider, marginBottom: Spacing.lg },
   exerciseList: { gap: Spacing.sm },
-  startButton: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: Spacing.sm, backgroundColor: C.primary, borderRadius: Radius.sm, paddingVertical: 10, marginTop: Spacing.lg },
-  startButtonText: { ...Typography.button, color: C.primaryFg },
+  startButton: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: Spacing.sm, backgroundColor: C.primary, borderRadius: Radius.full, paddingVertical: 16, paddingHorizontal: Spacing.xl, marginTop: Spacing.lg },
+  startButtonText: { fontSize: 16, fontWeight: '700', color: C.primaryFg },
 });

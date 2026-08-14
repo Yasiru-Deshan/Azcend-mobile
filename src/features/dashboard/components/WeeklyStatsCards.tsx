@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { Flame, Clock } from 'lucide-react-native';
-import { Colors, Spacing, Radius, Typography } from '@/constants/theme';
+import { Colors, Spacing, Radius, Typography, SemanticIconColors } from '@/constants/theme';
 
 const C = Colors.dark;
 
@@ -17,14 +17,14 @@ export const WeeklyStatsCards = ({ workouts, minutes }: WeeklyStatsCardsProps) =
       <View style={styles.row}>
         <View style={styles.card}>
           <View style={styles.cardTopRow}>
-            <Flame size={18} color={C.primary} />
+            <Flame size={20} color={SemanticIconColors.streak} fill={SemanticIconColors.streak} />
             <Text style={styles.cardValue}>{workouts}</Text>
           </View>
           <Text style={styles.cardLabel}>Completed Workouts</Text>
         </View>
         <View style={styles.card}>
           <View style={styles.cardTopRow}>
-            <Clock size={18} color={C.primaryMutedOpaque} />
+            <Clock size={20} color={SemanticIconColors.time} />
             <Text style={styles.cardValue}>{minutes}</Text>
           </View>
           <Text style={styles.cardLabel}>Spent Minutes</Text>

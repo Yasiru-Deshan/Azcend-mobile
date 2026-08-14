@@ -1,4 +1,5 @@
 import { Colors, Radius, Spacing, Typography } from '@/constants/theme';
+import { ScreenHeader } from '@/src/components/ScreenHeader';
 import { ProfileAboutCard } from '@/src/features/profile/components/ProfileAboutCard';
 import { ProfileProgressSection } from '@/src/features/profile/components/ProfileProgressSection';
 import { mockUserProfile, mockCheckinHistory } from '@/src/features/profile/mockData';
@@ -24,10 +25,10 @@ export default function ProfileTabScreen() {
         contentContainerStyle={styles.content}
         showsVerticalScrollIndicator={false}
       >
-        <View style={styles.header}>
-          <Text style={styles.screenTitle}>My Profile</Text>
-          <Text style={styles.subtitle}>Manage your account and view your progress.</Text>
-        </View>
+        <ScreenHeader
+          title="My Profile"
+          subtitle="Manage your account and view your progress."
+        />
 
         <ProfileAboutCard
           user={mockUserProfile}
@@ -41,14 +42,14 @@ export default function ProfileTabScreen() {
         >
           <View style={styles.linkCardLeft}>
             <View style={styles.iconBox}>
-              <Camera size={20} color={C.primary} />
+              <Camera size={24} color={C.primary} />
             </View>
             <View>
               <Text style={styles.linkTitle}>Check-in Photos History</Text>
               <Text style={styles.linkSubtitle}>View all past progress photos</Text>
             </View>
           </View>
-          <ChevronRight size={20} color={C.textMuted} />
+          <ChevronRight size={22} color={C.textMuted} />
         </TouchableOpacity>
 
         <ProfileProgressSection data={mockCheckinHistory} />
@@ -79,14 +80,14 @@ const styles = StyleSheet.create({
     color: C.text,
   },
   subtitle: {
-    fontSize: 14,
+    fontSize: 15,
     color: C.textMuted,
   },
   linkCard: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    padding: Spacing.lg,
+    padding: Spacing.xl,
     backgroundColor: C.card,
     borderRadius: Radius.lg,
     borderWidth: 1,
@@ -98,20 +99,20 @@ const styles = StyleSheet.create({
     gap: Spacing.md,
   },
   iconBox: {
-    width: 40,
-    height: 40,
-    borderRadius: Radius.md,
+    width: 48,
+    height: 48,
+    borderRadius: Radius.lg,
     backgroundColor: C.primaryMuted,
     alignItems: 'center',
     justifyContent: 'center',
   },
   linkTitle: {
-    fontSize: 14,
-    fontWeight: '600',
+    fontSize: 16,
+    fontWeight: '700',
     color: C.text,
   },
   linkSubtitle: {
-    fontSize: 12,
+    fontSize: 13,
     color: C.textMuted,
     marginTop: 2,
   },

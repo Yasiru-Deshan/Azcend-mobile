@@ -1,17 +1,17 @@
 import { Platform } from 'react-native';
 
 export const brand = {
-  50: '#f4fae6',
-  100: '#e6f5cc',
-  200: '#c2ea80',
-  300: '#a5e140',
-  400: '#9ae800',
-  500: '#8CD400', // Primary brand color
-  600: '#7ab800',
-  700: '#659900',
-  800: '#4c7300',
-  900: '#334d00',
-  950: '#1a2600',
+  50: '#f5f3ff',
+  100: '#ede9fe',
+  200: '#ddd6fe',
+  300: '#c4b5fd',
+  400: '#a78bfa',
+  500: '#7C3AED', // Primary brand color (Violet)
+  600: '#6d28d9',
+  700: '#5b21b6',
+  800: '#4c1d95',
+  900: '#3b0764',
+  950: '#2e1065',
 } as const;
 
 export const Colors = {
@@ -24,9 +24,9 @@ export const Colors = {
     textMuted: '#71717a',
     textSubtle: '#a1a1aa',
     primary: brand[500],
-    primaryFg: brand[950],
-    primaryMuted: 'rgba(140, 212, 0, 0.1)',
-    primaryBorder: 'rgba(140, 212, 0, 0.2)',
+    primaryFg: '#ffffff',
+    primaryMuted: 'rgba(124, 58, 237, 0.12)',
+    primaryBorder: 'rgba(124, 58, 237, 0.25)',
     accent: '#a855f7',
     online: '#10b981',
     success: '#10b981',
@@ -47,10 +47,10 @@ export const Colors = {
     textMuted: '#71717a',
     textSubtle: '#52525b',
     primary: brand[500],
-    primaryFg: brand[950],
-    primaryMuted: 'rgba(140, 212, 0, 0.1)',
-    primaryBorder: 'rgba(140, 212, 0, 0.2)',
-    primaryMutedOpaque: 'rgba(140, 212, 0, 0.8)',
+    primaryFg: '#ffffff',
+    primaryMuted: 'rgba(124, 58, 237, 0.12)',
+    primaryBorder: 'rgba(124, 58, 237, 0.25)',
+    primaryMutedOpaque: 'rgba(124, 58, 237, 0.8)',
     accent: '#a855f7',
     online: '#10b981',
     success: '#10b981',
@@ -75,6 +75,15 @@ export const ChartColors = {
   yellow: '#eab308',
   lime: '#84cc16',
   green: '#22c55e',
+} as const;
+
+export const SemanticIconColors = {
+  streak: '#FF9500',
+  time: '#5AC8FA',
+  workout: '#7C3AED',
+  meals: '#4CD964',
+  chat: '#FF6482',
+  profile: '#E5E5E7',
 } as const;
 
 export const Fonts = Platform.select({
@@ -114,11 +123,11 @@ export const Radius = {
 export const Typography = {
   h1: { fontSize: 28, fontWeight: '700', letterSpacing: -0.5 },
   h2: { fontSize: 22, fontWeight: '700', letterSpacing: -0.3 },
-  h3: { fontSize: 18, fontWeight: '500', letterSpacing: -0.2 },
-  section: { fontSize: 15, fontWeight: '600', letterSpacing: -0.3 },
-  body: { fontSize: 13, lineHeight: 20 },
-  small: { fontSize: 11, lineHeight: 16 },
+  h3: { fontSize: 20, fontWeight: '700', letterSpacing: -0.2 },
+  section: { fontSize: 18, fontWeight: '700', letterSpacing: -0.3 },
+  body: { fontSize: 14, lineHeight: 21 },
+  small: { fontSize: 12, lineHeight: 17 },
   badge: { fontSize: 11, fontWeight: '700' },
   button: { fontSize: 14, fontWeight: '600' },
-  label: { fontSize: 12, fontWeight: '500' },
+  label: { fontSize: 13, fontWeight: '600' },
 } as const;

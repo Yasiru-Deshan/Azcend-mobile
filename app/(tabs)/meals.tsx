@@ -7,6 +7,7 @@ import { useRouter } from 'expo-router';
 import { useMealStore } from '@/src/store/meal.store';
 import { Colors, Spacing, Typography, Radius } from '@/constants/theme';
 
+import { ScreenHeader } from '@/src/components/ScreenHeader';
 import { PlanInfoHeader } from '@/src/features/meals/components/PlanInfoHeader';
 import { NutritionTargetsGrid } from '@/src/features/meals/components/NutritionTargetsGrid';
 import { NutritionProgress } from '@/src/features/meals/components/NutritionProgress';
@@ -21,13 +22,17 @@ export default function MealsTabScreen() {
   if (!currentPlan) {
     return (
       <SafeAreaView style={styles.safeArea} edges={['top', 'left', 'right']}>
-        <View style={styles.headerRow}>
-          <Text style={styles.screenTitle}>Meal Plan</Text>
-          <TouchableOpacity onPress={() => router.push('/meals/history')} activeOpacity={0.7}>
-            <View style={styles.historyBtn}>
-              <History size={20} color={C.text} />
-            </View>
-          </TouchableOpacity>
+        <View style={{ paddingHorizontal: Spacing.xl, paddingTop: Spacing.xl }}>
+          <ScreenHeader
+            title="Meal Plan"
+            rightAction={
+              <TouchableOpacity onPress={() => router.push('/meals/history')} activeOpacity={0.7}>
+                <View style={styles.historyBtn}>
+                  <History size={20} color={C.text} />
+                </View>
+              </TouchableOpacity>
+            }
+          />
         </View>
         <View style={styles.emptyContainer}>
           <View style={styles.emptyIconBox}>
@@ -55,14 +60,16 @@ export default function MealsTabScreen() {
         contentContainerStyle={styles.content}
         showsVerticalScrollIndicator={false}
       >
-        <View style={styles.headerRow}>
-          <Text style={styles.screenTitle}>Meal Plan</Text>
-          <TouchableOpacity onPress={() => router.push('/meals/history')} activeOpacity={0.7}>
-            <View style={styles.historyBtn}>
-              <History size={20} color={C.text} />
-            </View>
-          </TouchableOpacity>
-        </View>
+        <ScreenHeader
+          title="Meal Plan"
+          rightAction={
+            <TouchableOpacity onPress={() => router.push('/meals/history')} activeOpacity={0.7}>
+              <View style={styles.historyBtn}>
+                <History size={20} color={C.text} />
+              </View>
+            </TouchableOpacity>
+          }
+        />
 
         <PlanInfoHeader
           name={currentPlan.name}

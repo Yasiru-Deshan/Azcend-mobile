@@ -27,15 +27,15 @@ export const ProfileAboutCard = ({ user, onLogout, onEditProfile }: ProfileAbout
 
       <View style={styles.infoSection}>
         <View style={styles.infoRow}>
-          <Mail size={16} color={C.textMuted} />
+          <Mail size={18} color={C.textMuted} />
           <Text style={styles.infoText}>{user.email}</Text>
         </View>
         <View style={styles.infoRow}>
-          <Phone size={16} color={C.textMuted} />
+          <Phone size={18} color={C.textMuted} />
           <Text style={styles.infoText}>{user.mobile}</Text>
         </View>
         <View style={styles.infoRow}>
-          <Award size={16} color={C.textMuted} />
+          <Award size={18} color={C.textMuted} />
           <Text style={styles.infoText}>
             Subscription: <Text style={styles.subscriptionBold}>{user.subscription}</Text>
           </Text>
@@ -57,7 +57,7 @@ export const ProfileAboutCard = ({ user, onLogout, onEditProfile }: ProfileAbout
             activeOpacity={0.7}
             onPress={onLogout}
           >
-            <LogOut size={14} color="#f43f5e" />
+            <LogOut size={16} color="#f43f5e" />
             <Text style={styles.logoutButtonText}>Sign Out</Text>
           </TouchableOpacity>
         )}
@@ -82,8 +82,8 @@ const styles = StyleSheet.create({
     paddingBottom: Spacing.md,
   },
   avatar: {
-    width: 64,
-    height: 64,
+    width: 72,
+    height: 72,
     borderRadius: Radius.full,
     borderWidth: 2,
     borderColor: C.primaryMutedOpaque,
@@ -93,12 +93,12 @@ const styles = StyleSheet.create({
   },
   nameText: {
     ...Typography.h2,
-    fontSize: 20,
+    fontSize: 24,
     color: C.text,
     marginBottom: 4,
   },
   joinedText: {
-    fontSize: 12,
+    fontSize: 14,
     color: C.textMuted,
   },
   infoSection: {
@@ -109,10 +109,10 @@ const styles = StyleSheet.create({
   infoRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: Spacing.sm,
+    gap: Spacing.md,
   },
   infoText: {
-    fontSize: 13,
+    fontSize: 15,
     color: C.text,
   },
   subscriptionBold: {
@@ -133,8 +133,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     gap: Spacing.sm,
-    height: 36,
-    borderRadius: Radius.sm,
+    height: 44,
+    borderRadius: Radius.full,
     borderWidth: 1,
   },
   editButton: {
@@ -142,17 +142,17 @@ const styles = StyleSheet.create({
     backgroundColor: C.surface,
   },
   editButtonText: {
-    fontSize: 13,
+    fontSize: 15,
     fontWeight: '600',
     color: C.text,
   },
   logoutButton: {
-    borderColor: 'rgba(244, 63, 94, 0.2)', // rose outline
+    borderColor: 'rgba(244, 63, 94, 0.2)',
     backgroundColor: 'rgba(244, 63, 94, 0.05)',
   },
   logoutButtonText: {
-    fontSize: 13,
+    fontSize: 15,
     fontWeight: '600',
-    color: '#f43f5e', // rose text
+    color: '#f43f5e',
   },
 });

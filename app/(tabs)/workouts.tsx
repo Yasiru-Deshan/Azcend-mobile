@@ -5,6 +5,7 @@ import { Alert, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'rea
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { Colors, Radius, Spacing, Typography } from '@/constants/theme';
+import { ScreenHeader } from '@/src/components/ScreenHeader';
 import { ActiveSessionHeader } from '@/src/features/workouts/components/ActiveSessionHeader';
 import { ExerciseSetLogger } from '@/src/features/workouts/components/ExerciseSetLogger';
 import { ProgramOverviewCard } from '@/src/features/workouts/components/ProgramOverviewCard';
@@ -151,14 +152,16 @@ export default function WorkoutsTab() {
         contentContainerStyle={styles.content}
         showsVerticalScrollIndicator={false}
       >
-        <View style={styles.headerRow}>
-          <Text style={styles.screenTitle}>My Program</Text>
-          <TouchableOpacity onPress={() => router.push('/workouts/history')} activeOpacity={0.7}>
-            <View style={styles.historyBtn}>
-              <History size={20} color={C.text} />
-            </View>
-          </TouchableOpacity>
-        </View>
+        <ScreenHeader
+          title="My Program"
+          rightAction={
+            <TouchableOpacity onPress={() => router.push('/workouts/history')} activeOpacity={0.7}>
+              <View style={styles.historyBtn}>
+                <History size={20} color={C.text} />
+              </View>
+            </TouchableOpacity>
+          }
+        />
 
         <ProgramOverviewCard template={currentTemplate} />
 
@@ -185,7 +188,7 @@ export default function WorkoutsTab() {
 const styles = StyleSheet.create({
   safeArea: { flex: 1, backgroundColor: C.background },
   scroll: { flex: 1, backgroundColor: C.background },
-  content: { paddingHorizontal: Spacing.xl, paddingTop: Spacing['3xl'], paddingBottom: Spacing['4xl'], gap: Spacing['3xl'] },
+  content: { paddingHorizontal: Spacing.xl, paddingTop: Spacing.xl, paddingBottom: Spacing['4xl'], gap: Spacing['2xl'] },
 
   screenTitle: { ...Typography.h1, color: C.text },
   headerRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
