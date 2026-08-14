@@ -2,10 +2,10 @@ import { Colors, Radius, Spacing, Typography } from '@/constants/theme';
 import { ScreenHeader } from '@/src/components/ScreenHeader';
 import { ProfileAboutCard } from '@/src/features/profile/components/ProfileAboutCard';
 import { ProfileProgressSection } from '@/src/features/profile/components/ProfileProgressSection';
-import { mockUserProfile, mockCheckinHistory } from '@/src/features/profile/mockData';
+import { mockCheckinHistory } from '@/src/features/profile/mockData';
 import { useRouter } from 'expo-router';
 import { Camera, ChevronRight } from 'lucide-react-native';
-import React from 'react';
+import React, { useEffect } from 'react';
 import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
@@ -15,7 +15,15 @@ const C = Colors.dark;
 
 export default function ProfileTabScreen() {
   const router = useRouter();
-  const logout = useAuthStore((state) => state.logout);
+  const { profile, fetchProfile, isAuthenticated, logout } = useAuthStore();
+
+  useEffect(() => {
+    if (!isAuthenticated) {
+      router.replace('/login');
+      return;
+    }
+    fetchProfile();
+  }, [isAuthenticated]);
 
   const handleLogout = async () => {
     await logout();
@@ -35,7 +43,7 @@ export default function ProfileTabScreen() {
         />
 
         <ProfileAboutCard
-          user={mockUserProfile}
+          user={profile}
           onLogout={handleLogout}
         />
 

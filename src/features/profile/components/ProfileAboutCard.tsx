@@ -1,43 +1,57 @@
 import { Colors, Radius, Spacing, Typography } from '@/constants/theme';
-import { Award, LogOut, Mail, Phone } from 'lucide-react-native';
+import { Award, LogOut, Mail, Phone, User as UserIcon } from 'lucide-react-native';
 import React from 'react';
-import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator, Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import type { UserProfile } from '../types';
 
 const C = Colors.dark;
 
 interface ProfileAboutCardProps {
-  user: UserProfile;
+  user?: UserProfile | null;
   onLogout?: () => void;
   onEditProfile?: () => void;
 }
 
 export const ProfileAboutCard = ({ user, onLogout, onEditProfile }: ProfileAboutCardProps) => {
-  const formattedDate = new Date(user.joinedAt).toLocaleDateString();
+  if (!user) return null;
+
+  const formattedDate = user.joinedAt
+    ? new Date(user.joinedAt).toLocaleDateString()
+    : '';
 
   return (
     <View style={styles.card}>
       <View style={styles.header}>
-        <Image source={{ uri: user.avatarUrl }} style={styles.avatar} />
+        {user.avatarUrl ? (
+          <Image source={{ uri: user.avatarUrl }} style={styles.avatar} />
+        ) : (
+          <View style={[styles.avatar, styles.avatarFallback]}>
+            <UserIcon size={32} color={C.primary} />
+          </View>
+        )}
         <View style={styles.headerTextContainer}>
-          <Text style={styles.nameText} numberOfLines={1}>{user.name}</Text>
-          <Text style={styles.joinedText}>Member since {formattedDate}</Text>
+          <Text style={styles.nameText} numberOfLines={1}>{user.name || 'User'}</Text>
+          {formattedDate ? <Text style={styles.joinedText}>Member since {formattedDate}</Text> : null}
         </View>
       </View>
 
       <View style={styles.infoSection}>
-        <View style={styles.infoRow}>
-          <Mail size={18} color={C.textMuted} />
-          <Text style={styles.infoText}>{user.email}</Text>
-        </View>
-        <View style={styles.infoRow}>
-          <Phone size={18} color={C.textMuted} />
-          <Text style={styles.infoText}>{user.mobile}</Text>
-        </View>
+        {user.email ? (
+          <View style={styles.infoRow}>
+            <Mail size={18} color={C.textMuted} />
+            <Text style={styles.infoText}>{user.email}</Text>
+          </View>
+        ) : null}
+        {user.mobile ? (
+          <View style={styles.infoRow}>
+            <Phone size={18} color={C.textMuted} />
+            <Text style={styles.infoText}>{user.mobile}</Text>
+          </View>
+        ) : null}
         <View style={styles.infoRow}>
           <Award size={18} color={C.textMuted} />
           <Text style={styles.infoText}>
-            Subscription: <Text style={styles.subscriptionBold}>{user.subscription}</Text>
+            Subscription: <Text style={styles.subscriptionBold}>{user.subscription || 'Free'}</Text>
           </Text>
         </View>
       </View>
@@ -74,6 +88,16 @@ const styles = StyleSheet.create({
     borderColor: C.cardBorder,
     overflow: 'hidden',
   },
+  loadingCard: {
+    padding: Spacing['2xl'],
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: Spacing.sm,
+  },
+  loadingText: {
+    fontSize: 13,
+    color: C.textMuted,
+  },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -87,6 +111,11 @@ const styles = StyleSheet.create({
     borderRadius: Radius.full,
     borderWidth: 2,
     borderColor: C.primaryMutedOpaque,
+  },
+  avatarFallback: {
+    backgroundColor: C.primaryMuted,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   headerTextContainer: {
     flex: 1,
