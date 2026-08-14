@@ -66,6 +66,17 @@ export const Colors = {
 
 export type ColorScheme = keyof typeof Colors;
 
+export const ChartColors = {
+  blue: '#3b82f6',
+  purple: '#8b5cf6',
+  pink: '#ec4899',
+  rose: '#f43f5e',
+  orange: '#f97316',
+  yellow: '#eab308',
+  lime: '#84cc16',
+  green: '#22c55e',
+} as const;
+
 export const Fonts = Platform.select({
   ios: {
     sans: 'system-ui',

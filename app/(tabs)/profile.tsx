@@ -1,6 +1,7 @@
 import { Colors, Radius, Spacing, Typography } from '@/constants/theme';
 import { ProfileAboutCard } from '@/src/features/profile/components/ProfileAboutCard';
-import { mockUserProfile } from '@/src/features/profile/mockData';
+import { ProfileProgressSection } from '@/src/features/profile/components/ProfileProgressSection';
+import { mockUserProfile, mockCheckinHistory } from '@/src/features/profile/mockData';
 import { useRouter } from 'expo-router';
 import { Camera, ChevronRight } from 'lucide-react-native';
 import React from 'react';
@@ -50,7 +51,7 @@ export default function ProfileTabScreen() {
           <ChevronRight size={20} color={C.textMuted} />
         </TouchableOpacity>
 
-        {/* Placeholder for future Progress Section */}
+        <ProfileProgressSection data={mockCheckinHistory} />
       </ScrollView>
     </SafeAreaView>
   );
