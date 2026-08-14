@@ -1,66 +1,77 @@
-import React, { useState } from 'react';
-import { View, KeyboardAvoidingView, Platform, StyleSheet } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { ChatHeader, ChatUser, ChatMessage } from '@/src/features/chat/components/ChatHeader';
-import { MessageArea } from '@/src/features/chat/components/MessageArea';
+import { Colors, Spacing } from '@/constants/theme';
+import { ChatHeader } from '@/src/features/chat/components/ChatHeader';
 import { ChatInput } from '@/src/features/chat/components/ChatInput';
-import { Colors } from '@/constants/theme';
+import { MessageArea } from '@/src/features/chat/components/MessageArea';
+import { useAuthStore } from '@/src/store/auth.store';
+import { useChatStore } from '@/src/store/chat.store';
+import React, { useEffect, useState } from 'react';
+import { ActivityIndicator, KeyboardAvoidingView, Platform, StyleSheet, Text, View } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 const C = Colors.dark;
 
 export default function ChatTabScreen() {
-  const [messages, setMessages] = useState<ChatMessage[]>([
-    {
-      id: '1',
-      chatId: 'coach-chat',
-      senderId: 'coach-1',
-      content: 'Hey Yasiru! How are the new macros working out for you this week?',
-      timestamp: new Date(Date.now() - 1000 * 60 * 60 * 24).toISOString(), // yesterday
-    },
-    {
-      id: '2',
-      chatId: 'coach-chat',
-      senderId: 'me',
-      content: "Pretty good! I've been hitting the protein goals easily, but slightly over on carbs a couple of days.",
-      timestamp: new Date(Date.now() - 1000 * 60 * 60 * 2).toISOString(), // 2 hours ago
-    }
-  ]);
+  const {
+    messages,
+    isLoading,
+    isConnected,
+    error,
+    connectSocket,
+    disconnectSocket,
+    fetchMessages,
+    sendMessage,
+    clearError,
+  } = useChatStore();
+
+  const coach = useAuthStore((state) => state.coach);
+  const currentUserId = useAuthStore((state) => state.user?.id ?? '');
 
   const [inputValue, setInputValue] = useState('');
 
-  const coach: ChatUser = {
-    id: 'coach-1',
-    name: 'Coach Sarah',
-    isOnline: true,
-  };
+  useEffect(() => {
+    connectSocket();
+
+    if (coach?.id) {
+      fetchMessages(coach.id);
+    }
+
+    return () => {
+      disconnectSocket();
+    };
+  }, [coach?.id]);
 
   const handleSendMessage = () => {
-    if (!inputValue.trim()) return;
-
-    const newMessage: ChatMessage = {
-      id: `m-${Date.now()}`,
-      chatId: 'coach-chat',
-      senderId: 'me',
-      content: inputValue.trim(),
-      timestamp: new Date().toISOString(),
-    };
-
-    setMessages((prev) => [...prev, newMessage]);
+    if (!inputValue.trim() || !coach?.id) return;
+    sendMessage(inputValue.trim(), coach.id);
     setInputValue('');
   };
 
   return (
     <SafeAreaView style={styles.safeArea} edges={['top', 'left', 'right']}>
-      <KeyboardAvoidingView 
-        style={styles.keyboardAvoid} 
+      <KeyboardAvoidingView
+        style={styles.keyboardAvoid}
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}
       >
         <View style={styles.container}>
-          <ChatHeader otherUser={coach} />
-          
-          <MessageArea messages={messages} />
-          
-          <ChatInput 
+          <ChatHeader otherUser={coach ?? undefined} />
+
+          {!isConnected && !isLoading && (
+            <View style={styles.banner}>
+              <Text style={styles.bannerText}>
+                {error ?? 'Connecting to chat...'}
+              </Text>
+            </View>
+          )}
+
+          {isLoading ? (
+            <View style={styles.centered}>
+              <ActivityIndicator color={C.primary} />
+            </View>
+          ) : (
+            <MessageArea messages={messages} currentUserId={currentUserId} />
+          )}
+
+          <ChatInput
             inputValue={inputValue}
             onInputChange={setInputValue}
             onSendMessage={handleSendMessage}
@@ -82,5 +93,21 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: C.background,
+  },
+  centered: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  banner: {
+    backgroundColor: C.cardBorder,
+    paddingVertical: Spacing.sm,
+    paddingHorizontal: Spacing.lg,
+    alignItems: 'center',
+  },
+  bannerText: {
+    fontSize: 12,
+    color: C.textMuted,
+    fontWeight: '500',
   },
 });

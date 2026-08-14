@@ -1,15 +1,16 @@
 import { Colors, Radius, Spacing } from '@/constants/theme';
 import React, { useEffect, useRef } from 'react';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
-import type { ChatMessage } from './ChatHeader';
+import type { ChatMessage } from '@/src/services/chat.service';
 
 const C = Colors.dark;
 
 interface MessageAreaProps {
   messages: ChatMessage[];
+  currentUserId: string;
 }
 
-export const MessageArea = ({ messages }: MessageAreaProps) => {
+export const MessageArea = ({ messages, currentUserId }: MessageAreaProps) => {
   const scrollViewRef = useRef<ScrollView>(null);
 
   const formatTime = (isoString: string) => {
@@ -48,8 +49,8 @@ export const MessageArea = ({ messages }: MessageAreaProps) => {
       showsVerticalScrollIndicator={false}
     >
       {messages.map((message) => {
-        const isMe = message.senderId === 'me';
-        const currentDateHeader = formatDateHeader(message.timestamp);
+        const isMe = message.senderId === currentUserId;
+        const currentDateHeader = formatDateHeader(message.createdAt);
         const showDateHeader = currentDateHeader !== lastDateHeader;
 
         if (showDateHeader) {
@@ -72,7 +73,7 @@ export const MessageArea = ({ messages }: MessageAreaProps) => {
                   {message.content}
                 </Text>
                 <Text style={[styles.timeText, isMe ? styles.timeTextMe : styles.timeTextOther]}>
-                  {formatTime(message.timestamp)}
+                  {formatTime(message.createdAt)}
                 </Text>
               </View>
             </View>
@@ -154,7 +155,7 @@ const styles = StyleSheet.create({
     marginTop: 2,
   },
   timeTextMe: {
-    color: 'rgba(26, 38, 0, 0.6)',
+    color: 'rgba(255, 255, 255, 0.75)',
   },
   timeTextOther: {
     color: C.textSubtle,

@@ -1,13 +1,14 @@
-import { Colors, Radius, Spacing } from '@/constants/theme';
 import React from 'react';
-import { Image, StyleSheet, Text, View } from 'react-native';
+import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Phone, Info } from 'lucide-react-native';
+import { Colors, Radius, Spacing } from '@/constants/theme';
 
 const C = Colors.dark;
 
 export interface ChatUser {
   id: string;
   name: string;
-  isOnline: boolean;
+  isOnline?: boolean;
   avatarUrl?: string;
 }
 
@@ -26,29 +27,40 @@ interface ChatHeaderProps {
 export const ChatHeader = ({ otherUser }: ChatHeaderProps) => {
   return (
     <View style={styles.headerContainer}>
-      <View style={styles.avatarWrapper}>
-        {otherUser?.avatarUrl ? (
-          <Image
-            source={{ uri: otherUser.avatarUrl }}
-            style={styles.avatarImage}
-          />
-        ) : (
-          <View style={styles.avatarFallback}>
-            <Text style={styles.avatarFallbackText}>
-              {otherUser?.name?.charAt(0) || '?'}
-            </Text>
-          </View>
-        )}
-        {otherUser?.isOnline && <View style={styles.onlineBadge} />}
+      <View style={styles.leftSection}>
+        <View style={styles.avatarWrapper}>
+          {otherUser?.avatarUrl ? (
+            <Image
+              source={{ uri: otherUser.avatarUrl }}
+              style={styles.avatarImage}
+            />
+          ) : (
+            <View style={styles.avatarFallback}>
+              <Text style={styles.avatarFallbackText}>
+                {otherUser?.name?.charAt(0) || '?'}
+              </Text>
+            </View>
+          )}
+          {otherUser?.isOnline && <View style={styles.onlineBadge} />}
+        </View>
+
+        <View style={styles.infoWrapper}>
+          <Text style={styles.nameText}>
+            {otherUser?.name || 'Your Coach'}
+          </Text>
+          <Text style={styles.statusText}>
+            {otherUser?.isOnline ? 'Online' : 'Offline'}
+          </Text>
+        </View>
       </View>
 
-      <View style={styles.infoWrapper}>
-        <Text style={styles.nameText}>
-          {otherUser?.name || 'Your Coach'}
-        </Text>
-        <Text style={styles.statusText}>
-          {otherUser?.isOnline ? 'Online' : 'Offline'}
-        </Text>
+      <View style={styles.actionRow}>
+        <TouchableOpacity style={styles.actionBtn} activeOpacity={0.7}>
+          <Phone size={18} color={C.textMuted} />
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.actionBtn} activeOpacity={0.7}>
+          <Info size={18} color={C.textMuted} />
+        </TouchableOpacity>
       </View>
     </View>
   );
@@ -58,11 +70,29 @@ const styles = StyleSheet.create({
   headerContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: Spacing.md,
+    justifyContent: 'space-between',
     padding: Spacing.lg,
     borderBottomWidth: 1,
     borderBottomColor: C.cardBorder,
     backgroundColor: 'rgba(10, 10, 10, 0.85)',
+  },
+  leftSection: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.md,
+  },
+  actionRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.sm,
+  },
+  actionBtn: {
+    width: 36,
+    height: 36,
+    borderRadius: Radius.full,
+    backgroundColor: C.surface,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   avatarWrapper: {
     position: 'relative',

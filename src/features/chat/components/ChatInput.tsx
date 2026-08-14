@@ -1,5 +1,5 @@
 import { Colors, Radius, Spacing } from '@/constants/theme';
-import { SendHorizontal } from 'lucide-react-native';
+import { Image as ImageIcon, SendHorizontal } from 'lucide-react-native';
 import React from 'react';
 import { StyleSheet, TextInput, TouchableOpacity, View } from 'react-native';
 
@@ -17,6 +17,10 @@ export const ChatInput = ({ inputValue, onInputChange, onSendMessage }: ChatInpu
   return (
     <View style={styles.container}>
       <View style={styles.inputWrapper}>
+        <TouchableOpacity style={styles.attachBtn} activeOpacity={0.7}>
+          <ImageIcon size={20} color={C.textMuted} />
+        </TouchableOpacity>
+
         <TextInput
           style={styles.input}
           value={inputValue}
@@ -32,7 +36,7 @@ export const ChatInput = ({ inputValue, onInputChange, onSendMessage }: ChatInpu
           disabled={isInputEmpty}
           activeOpacity={0.7}
         >
-          <SendHorizontal size={20} color={isInputEmpty ? C.textSubtle : C.primaryFg} />
+          <SendHorizontal size={18} color={isInputEmpty ? C.textSubtle : C.primaryFg} />
         </TouchableOpacity>
       </View>
     </View>
@@ -55,6 +59,14 @@ const styles = StyleSheet.create({
     borderColor: C.cardBorder,
     paddingHorizontal: Spacing.sm,
     paddingVertical: 6,
+  },
+  attachBtn: {
+    width: 36,
+    height: 36,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 4,
+    marginLeft: 2,
   },
   input: {
     flex: 1,
