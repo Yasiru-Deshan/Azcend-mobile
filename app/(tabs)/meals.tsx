@@ -1,8 +1,8 @@
-import React from 'react';
-import { ScrollView, View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import React, { useCallback } from 'react';
+import { ScrollView, View, Text, TouchableOpacity, StyleSheet, ActivityIndicator } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { History, UtensilsCrossed } from 'lucide-react-native';
-import { useRouter } from 'expo-router';
+import { useRouter, useFocusEffect } from 'expo-router';
 
 import { useMealStore } from '@/src/store/meal.store';
 import { Colors, Spacing, Typography, Radius } from '@/constants/theme';
@@ -17,7 +17,26 @@ const C = Colors.dark;
 
 export default function MealsTabScreen() {
   const router = useRouter();
-  const { currentPlan } = useMealStore();
+  const { currentPlan, isLoading, fetchAssignedPlans } = useMealStore();
+
+  useFocusEffect(
+    useCallback(() => {
+      fetchAssignedPlans();
+    }, [fetchAssignedPlans])
+  );
+
+  if (isLoading && !currentPlan) {
+    return (
+      <SafeAreaView style={styles.safeArea} edges={['top', 'left', 'right']}>
+        <View style={{ paddingHorizontal: Spacing.xl, paddingTop: Spacing.xl }}>
+          <ScreenHeader title="Meal Plan" />
+        </View>
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" color={C.primary} />
+        </View>
+      </SafeAreaView>
+    );
+  }
 
   if (!currentPlan) {
     return (
@@ -130,6 +149,7 @@ const styles = StyleSheet.create({
   cardStack:     { gap: Spacing.md },
 
   emptyContainer: { flex: 1, alignItems: 'center', justifyContent: 'center', padding: Spacing['2xl'] },
+  loadingContainer: { flex: 1, alignItems: 'center', justifyContent: 'center' },
   emptyIconBox: { width: 64, height: 64, borderRadius: Radius.xl, backgroundColor: C.primaryMuted, alignItems: 'center', justifyContent: 'center', marginBottom: Spacing.lg },
   emptyTitle: { ...Typography.h2, color: C.text, marginBottom: Spacing.sm },
   emptyText: { ...Typography.body, color: C.textMuted, textAlign: 'center' },

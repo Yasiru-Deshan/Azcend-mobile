@@ -1,6 +1,6 @@
 import { create } from 'zustand';
-import { persist, createJSONStorage } from 'zustand/middleware';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import { persist } from 'zustand/middleware';
+import { makePersistStorage } from './storage';
 
 export interface SetLog {
   weight: string;
@@ -307,7 +307,7 @@ export const useWorkoutStore = create<WorkoutState>()(
     }),
     {
       name: 'ascend-workout-v3-storage',
-      storage: createJSONStorage(() => AsyncStorage),
+      storage: makePersistStorage<WorkoutState>(),
       partialize: (state) => ({
         currentTemplate: state.currentTemplate,
         historyTemplates: state.historyTemplates,
@@ -321,7 +321,7 @@ export const useWorkoutStore = create<WorkoutState>()(
         endTime: state.endTime,
         completedWorkoutsCount: state.completedWorkoutsCount,
         spentMinutesCount: state.spentMinutesCount,
-      }),
+      }) as WorkoutState,
     }
   )
 );
