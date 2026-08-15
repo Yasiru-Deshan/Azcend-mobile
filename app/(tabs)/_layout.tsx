@@ -1,14 +1,21 @@
-import { Tabs } from 'expo-router';
+import { Redirect, Tabs } from 'expo-router';
 import React from 'react';
 import { Home, Dumbbell, Utensils, MessageCircle, User } from 'lucide-react-native';
 
 import { HapticTab } from '@/components/haptic-tab';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { Colors } from '@/constants/theme';
+import { useAuthStore } from '@/src/store/auth.store';
 
 export default function TabLayout() {
   const colorScheme = useColorScheme();
   const C = Colors[colorScheme ?? 'dark'];
+  const { isAuthenticated } = useAuthStore();
+
+  if (!isAuthenticated) {
+    return <Redirect href="/login" />;
+  }
+
 
   return (
     <Tabs

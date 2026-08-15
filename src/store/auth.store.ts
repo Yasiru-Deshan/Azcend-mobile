@@ -106,7 +106,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
           id: coachObj.id,
           name: `${coachObj.firstName || ''} ${coachObj.lastName || ''}`.trim() || coachObj.name,
           avatarUrl: coachObj.avatarUrl,
-          isOnline: true,
+          isOnline: coachObj.isOnline ?? false,
         }
         : null;
 

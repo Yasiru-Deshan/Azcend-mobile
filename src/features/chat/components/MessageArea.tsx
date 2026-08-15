@@ -1,7 +1,8 @@
 import { Colors, Radius, Spacing } from '@/constants/theme';
-import React, { useEffect, useRef } from 'react';
-import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import type { ChatMessage } from '@/src/services/chat.service';
+import { Check, CheckCheck } from 'lucide-react-native';
+import React, { useEffect, useRef } from 'react';
+import { Keyboard, ScrollView, StyleSheet, Text, View } from 'react-native';
 
 const C = Colors.dark;
 
@@ -12,6 +13,12 @@ interface MessageAreaProps {
 
 export const MessageArea = ({ messages, currentUserId }: MessageAreaProps) => {
   const scrollViewRef = useRef<ScrollView>(null);
+
+  const scrollToBottom = (animated = true) => {
+    setTimeout(() => {
+      scrollViewRef.current?.scrollToEnd({ animated });
+    }, 50);
+  };
 
   const formatTime = (isoString: string) => {
     const date = new Date(isoString);
@@ -34,12 +41,21 @@ export const MessageArea = ({ messages, currentUserId }: MessageAreaProps) => {
   };
 
   let lastDateHeader = '';
+  const absoluteLastMessage = messages[messages.length - 1];
 
   useEffect(() => {
-    setTimeout(() => {
-      scrollViewRef.current?.scrollToEnd({ animated: true });
-    }, 100);
+    scrollToBottom(true);
   }, [messages]);
+
+  useEffect(() => {
+    const showSub = Keyboard.addListener('keyboardDidShow', () => scrollToBottom(true));
+    const willShowSub = Keyboard.addListener('keyboardWillShow', () => scrollToBottom(true));
+
+    return () => {
+      showSub.remove();
+      willShowSub.remove();
+    };
+  }, []);
 
   return (
     <ScrollView
@@ -47,15 +63,20 @@ export const MessageArea = ({ messages, currentUserId }: MessageAreaProps) => {
       style={styles.container}
       contentContainerStyle={styles.contentContainer}
       showsVerticalScrollIndicator={false}
+      onContentSizeChange={() => scrollToBottom(false)}
     >
       {messages.map((message) => {
         const isMe = message.senderId === currentUserId;
+        const isLastMe = isMe && message.id === absoluteLastMessage?.id;
         const currentDateHeader = formatDateHeader(message.createdAt);
         const showDateHeader = currentDateHeader !== lastDateHeader;
 
         if (showDateHeader) {
           lastDateHeader = currentDateHeader;
         }
+
+        const isOptimistic = message.id.startsWith('optimistic-');
+        const statusLabel = isOptimistic ? 'Sending' : message.isRead ? 'Delivered' : 'Sent';
 
         return (
           <View key={message.id} style={styles.messageGroup}>
@@ -68,13 +89,28 @@ export const MessageArea = ({ messages, currentUserId }: MessageAreaProps) => {
             )}
 
             <View style={[styles.messageWrapper, isMe ? styles.messageWrapperMe : styles.messageWrapperOther]}>
-              <View style={[styles.bubble, isMe ? styles.bubbleMe : styles.bubbleOther]}>
-                <Text style={[styles.messageText, isMe ? styles.messageTextMe : styles.messageTextOther]}>
-                  {message.content}
-                </Text>
-                <Text style={[styles.timeText, isMe ? styles.timeTextMe : styles.timeTextOther]}>
-                  {formatTime(message.createdAt)}
-                </Text>
+              <View style={styles.bubbleContainer}>
+                <View style={[styles.bubble, isMe ? styles.bubbleMe : styles.bubbleOther]}>
+                  <Text style={[styles.messageText, isMe ? styles.messageTextMe : styles.messageTextOther]}>
+                    {message.content}
+                  </Text>
+                  <Text style={[styles.timeText, isMe ? styles.timeTextMe : styles.timeTextOther]}>
+                    {formatTime(message.createdAt)}
+                  </Text>
+                </View>
+
+                {isLastMe && (
+                  <View style={styles.statusRow}>
+                    {isOptimistic ? (
+                      <Check size={12} color={C.textSubtle} />
+                    ) : (
+                      <CheckCheck size={12} color={message.isRead ? C.primary : C.textSubtle} />
+                    )}
+                    <Text style={[styles.statusText, message.isRead && styles.statusTextRead]}>
+                      {statusLabel}
+                    </Text>
+                  </View>
+                )}
               </View>
             </View>
           </View>
@@ -120,8 +156,12 @@ const styles = StyleSheet.create({
   messageWrapperOther: {
     justifyContent: 'flex-start',
   },
-  bubble: {
+  bubbleContainer: {
     maxWidth: '80%',
+    alignItems: 'flex-end',
+  },
+  bubble: {
+    width: '100%',
     paddingHorizontal: Spacing.lg,
     paddingVertical: Spacing.md,
     borderRadius: Radius.xl,
@@ -159,5 +199,20 @@ const styles = StyleSheet.create({
   },
   timeTextOther: {
     color: C.textSubtle,
+  },
+  statusRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    marginTop: 4,
+    alignSelf: 'flex-end',
+  },
+  statusText: {
+    fontSize: 11,
+    fontWeight: '600',
+    color: C.textMuted,
+  },
+  statusTextRead: {
+    color: C.primary,
   },
 });

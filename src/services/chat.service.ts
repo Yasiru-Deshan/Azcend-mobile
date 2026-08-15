@@ -9,8 +9,15 @@ export interface ChatMessage {
   createdAt: string;
 }
 
+export interface PaginatedMessages {
+  data: ChatMessage[];
+  total: number;
+  page: number;
+  limit: number;
+}
+
 export async function fetchConversationApi(token: string, otherUserId: string, page = 1, limit = 50) {
-  return apiRequest<ChatMessage[]>(`/chat/conversation/${otherUserId}?page=${page}&limit=${limit}`, {
+  return apiRequest<PaginatedMessages>(`/chat/conversation/${otherUserId}?page=${page}&limit=${limit}`, {
     method: 'GET',
     headers: { Authorization: `Bearer ${token}` },
   });

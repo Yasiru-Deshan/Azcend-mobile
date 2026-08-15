@@ -1,6 +1,6 @@
 import React from 'react';
 import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import { Phone, Info } from 'lucide-react-native';
+import { Info } from 'lucide-react-native';
 import { Colors, Radius, Spacing } from '@/constants/theme';
 
 const C = Colors.dark;
@@ -55,9 +55,6 @@ export const ChatHeader = ({ otherUser }: ChatHeaderProps) => {
       </View>
 
       <View style={styles.actionRow}>
-        <TouchableOpacity style={styles.actionBtn} activeOpacity={0.7}>
-          <Phone size={18} color={C.textMuted} />
-        </TouchableOpacity>
         <TouchableOpacity style={styles.actionBtn} activeOpacity={0.7}>
           <Info size={18} color={C.textMuted} />
         </TouchableOpacity>

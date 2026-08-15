@@ -4,7 +4,8 @@ import { ChatInput } from '@/src/features/chat/components/ChatInput';
 import { MessageArea } from '@/src/features/chat/components/MessageArea';
 import { useAuthStore } from '@/src/store/auth.store';
 import { useChatStore } from '@/src/store/chat.store';
-import React, { useEffect, useState } from 'react';
+import { useFocusEffect } from 'expo-router';
+import React, { useCallback, useEffect, useState } from 'react';
 import { ActivityIndicator, KeyboardAvoidingView, Platform, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
@@ -20,7 +21,6 @@ export default function ChatTabScreen() {
     disconnectSocket,
     fetchMessages,
     sendMessage,
-    clearError,
   } = useChatStore();
 
   const coach = useAuthStore((state) => state.coach);
@@ -30,15 +30,19 @@ export default function ChatTabScreen() {
 
   useEffect(() => {
     connectSocket();
-
-    if (coach?.id) {
-      fetchMessages(coach.id);
-    }
-
     return () => {
       disconnectSocket();
     };
-  }, [coach?.id]);
+  }, []);
+
+  useFocusEffect(
+    useCallback(() => {
+      if (coach?.id) {
+        fetchMessages(coach.id);
+      }
+    }, [coach?.id])
+  );
+
 
   const handleSendMessage = () => {
     if (!inputValue.trim() || !coach?.id) return;
@@ -50,7 +54,7 @@ export default function ChatTabScreen() {
     <SafeAreaView style={styles.safeArea} edges={['top', 'left', 'right']}>
       <KeyboardAvoidingView
         style={styles.keyboardAvoid}
-        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       >
         <View style={styles.container}>
           <ChatHeader otherUser={coach ?? undefined} />

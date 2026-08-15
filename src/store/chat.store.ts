@@ -65,6 +65,23 @@ export const useChatStore = create<ChatState>((set, get) => ({
       });
     });
 
+    socket.on('messages_read', (data: { by: string }) => {
+      set((state) => ({
+        messages: state.messages.map((m) =>
+          m.receiverId === data.by ? { ...m, isRead: true } : m
+        ),
+      }));
+    });
+
+    socket.on('user_status', (data: { userId: string; isOnline: boolean }) => {
+      const coach = useAuthStore.getState().coach;
+      if (coach && coach.id === data.userId) {
+        useAuthStore.setState({
+          coach: { ...coach, isOnline: data.isOnline },
+        });
+      }
+    });
+
     socket.on('error', (err: { message: string }) => {
       set((state) => ({
         messages: state.messages.filter((m) => !m.id.startsWith('optimistic-')),
@@ -86,10 +103,10 @@ export const useChatStore = create<ChatState>((set, get) => ({
     set({ isLoading: true, error: null });
     const response = await fetchConversationApi(token, coachId);
 
-    if (response.data && Array.isArray(response.data)) {
-      set({ messages: response.data, isLoading: false });
+    if (response.data?.data && Array.isArray(response.data.data)) {
+      set({ messages: response.data.data, isLoading: false });
     } else {
-      set({ isLoading: false, error: response.error || null });
+      set({ isLoading: false, error: response.error || 'Failed to load messages' });
     }
   },
 
