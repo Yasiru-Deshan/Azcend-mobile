@@ -16,23 +16,28 @@ interface NutritionProgressProps {
   targetFat: number;
 }
 
-const ProgressBar = ({ label, current, target, unit, bgColor }: any) => {
+interface ProgressBarProps {
+  label: string;
+  current: number;
+  target: number;
+  unit: string;
+  bgColor: string;
+}
+
+const ProgressBar = ({ label, current, target, unit, bgColor }: ProgressBarProps) => {
   const pct = target > 0 ? Math.min((current / target) * 100, 100) : 0;
-  const onTarget = pct >= 90 && pct <= 110;
-  const activeColor = onTarget ? C.success : bgColor;
-  const valueColor = onTarget ? C.successFg : C.text;
 
   return (
     <View style={styles.barContainer}>
       <View style={styles.barHeader}>
         <Text style={styles.barLabel}>{label}</Text>
         <Text style={styles.barValueText}>
-          <Text style={{ color: valueColor, fontWeight: '700' }}>{current}</Text>
+          <Text style={{ color: C.text, fontWeight: '700' }}>{current}</Text>
           {' / '}{target} {unit}
         </Text>
       </View>
       <View style={styles.barTrack}>
-        <View style={[styles.barFill, { width: `${pct}%`, backgroundColor: activeColor }]} />
+        <View style={[styles.barFill, { width: `${pct}%`, backgroundColor: bgColor }]} />
       </View>
     </View>
   );
