@@ -30,7 +30,7 @@ export default function ActiveExerciseScreen() {
   } = useWorkoutStore();
 
   const template =
-    currentTemplate.id === activeTemplateId
+    currentTemplate?.id === activeTemplateId
       ? currentTemplate
       : historyTemplates.find((t) => t.id === activeTemplateId);
 

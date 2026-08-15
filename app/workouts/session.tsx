@@ -51,7 +51,7 @@ export default function WorkoutSessionScreen() {
   }, [startTime]);
 
   const template =
-    currentTemplate.id === activeTemplateId
+    currentTemplate?.id === activeTemplateId
       ? currentTemplate
       : historyTemplates.find((t) => t.id === activeTemplateId);
 

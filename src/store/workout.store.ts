@@ -1,6 +1,8 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { makePersistStorage } from './storage';
+import { fetchAssignedWorkoutTemplatesApi, fetchCurrentWorkoutTemplateApi } from '../services/workout.service';
+import { useAuthStore } from './auth.store';
 
 export interface SetLog {
   weight: string;
@@ -37,7 +39,7 @@ export interface WorkoutTemplate {
 }
 
 interface WorkoutState {
-  currentTemplate: WorkoutTemplate;
+  currentTemplate: WorkoutTemplate | null;
   historyTemplates: WorkoutTemplate[];
 
   activeTemplateId: string | null;
@@ -52,138 +54,25 @@ interface WorkoutState {
   completedWorkoutsCount: number;
   spentMinutesCount: number;
 
+  isLoading: boolean;
+  error: string | null;
+
   startDayWorkout: (templateId: string, dayId: string) => void;
   updateSet: (exerciseId: string, setIndex: number, weight: string, reps: string) => void;
   toggleSetCompleted: (exerciseId: string, setIndex: number) => void;
   completeExercise: (exerciseId: string) => void;
   finishWorkout: () => void;
   resetWorkoutState: () => void;
+  fetchWorkouts: () => Promise<void>;
 }
 
-const MOCK_CURRENT_TEMPLATE: WorkoutTemplate = {
-  id: 'lean-muscle-builder',
-  goalId: 'muscle-gain',
-  name: 'Lean Muscle Builder',
-  description: 'A comprehensive hypertrophy program focused on lean muscle gain while keeping overall body fat low.',
-  difficulty: 'Intermediate',
-  durationMinutes: 50,
-  days: [
-    {
-      id: 'day-1',
-      name: 'Day 1: Chest & Triceps',
-      exercises: [
-        {
-          id: 'bench-press',
-          name: 'Flat Barbell Bench Press',
-          sets: 4,
-          reps: '8-10 reps',
-          restSeconds: 90,
-          weightMode: 'HWLR',
-          instructions: 'Lie flat on a bench. Grip the barbell slightly wider than shoulder-width.',
-          videoUrl: 'https://assets.mixkit.co/videos/preview/mixkit-man-training-in-a-gym-with-barbell-bench-press-40242-large.mp4',
-          imageUrl: 'https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?q=80&w=800&auto=format&fit=crop',
-        },
-      ],
-    },
-    {
-      id: 'day-2',
-      name: 'Day 2: Back & Biceps',
-      exercises: [
-        {
-          id: 'lat-pulldown',
-          name: 'Lat Pulldown',
-          sets: 3,
-          reps: '10-12 reps',
-          restSeconds: 60,
-          weightMode: 'LWHR',
-          instructions: 'Sit at a pulldown machine and adjust the knee pad.',
-          videoUrl: 'https://assets.mixkit.co/videos/preview/mixkit-young-man-exercising-in-a-fitness-center-40234-large.mp4',
-          imageUrl: 'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?q=80&w=800&auto=format&fit=crop',
-        },
-      ],
-    },
-  ],
-};
 
-const MOCK_HISTORY_TEMPLATES: WorkoutTemplate[] = [
-  {
-    id: 'fat-loss-phase',
-    goalId: 'weight-loss',
-    name: 'Fat Loss Phase',
-    description: 'A beginner calorie-burning plan designed to shed body fat while preserving lean muscle mass. Focused on high repetitions and short rest intervals.',
-    difficulty: 'Beginner',
-    durationMinutes: 35,
-    days: [
-      {
-        id: 'fl-day-1',
-        name: 'Day 1: Full Body HIIT',
-        exercises: [
-          {
-            id: 'kettlebell-swings',
-            name: 'Kettlebell Swings',
-            sets: 3,
-            reps: '20 reps',
-            restSeconds: 30,
-            weightMode: 'LWHR',
-            instructions: 'Stand with feet shoulder-width apart. Swing the kettlebell back between your legs, then drive your hips forward to swing the kettlebell to eye level. Keep core tight.',
-            videoUrl: 'https://assets.mixkit.co/videos/preview/mixkit-athlete-man-performing-biceps-curl-with-dumbbells-41855-large.mp4',
-            imageUrl: 'https://images.unsplash.com/photo-1581009146145-b5ef050c2e1e?q=80&w=800&auto=format&fit=crop',
-          },
-        ],
-      },
-      {
-        id: 'fl-day-2',
-        name: 'Day 2: Core & Abs Recovery',
-        exercises: [
-          {
-            id: 'bicycle-crunches',
-            name: 'Bicycle Crunches',
-            sets: 3,
-            reps: '20 reps',
-            restSeconds: 30,
-            weightMode: 'LWHR',
-            instructions: 'Lie on your back with legs up. Alternate touching opposite elbow to opposite knee in a bicycle motion.',
-            videoUrl: 'https://assets.mixkit.co/videos/preview/mixkit-young-man-exercising-in-a-fitness-center-40234-large.mp4',
-            imageUrl: 'https://images.unsplash.com/photo-1541534741688-6078c6bfb5c5?q=80&w=800&auto=format&fit=crop',
-          },
-        ],
-      },
-    ],
-  },
-  {
-    id: 'strength-builder',
-    goalId: 'strength',
-    name: 'Strength Builder',
-    description: 'An advanced strength-building program based on low repetition, high weight compound lifting. Enhances absolute strength and power output.',
-    difficulty: 'Advanced',
-    durationMinutes: 60,
-    days: [
-      {
-        id: 'str-day-1',
-        name: 'Day 1: Deadlift Focus',
-        exercises: [
-          {
-            id: 'deadlifts',
-            name: 'Conventional Barbell Deadlifts',
-            sets: 5,
-            reps: '5 reps',
-            restSeconds: 180,
-            weightMode: 'HWLR',
-            instructions: 'Hinge at the hips and grip the barbell. Pull up in a vertical line by pushing the floor away, locking out at the hips. Keep your back straight throughout.',
-            videoUrl: 'https://assets.mixkit.co/videos/preview/mixkit-man-training-in-a-gym-with-barbell-bench-press-40242-large.mp4',
-            imageUrl: 'https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?q=80&w=800&auto=format&fit=crop',
-          },
-        ],
-      },
-    ],
-  },
-];
 
 export const useWorkoutStore = create<WorkoutState>()(
   persist(
     (set, get) => ({
-      currentTemplate: MOCK_CURRENT_TEMPLATE,
-      historyTemplates: MOCK_HISTORY_TEMPLATES,
+      currentTemplate: null,
+      historyTemplates: [],
 
       activeTemplateId: null,
       activeDayId: null,
@@ -197,11 +86,14 @@ export const useWorkoutStore = create<WorkoutState>()(
       completedWorkoutsCount: 3,
       spentMinutesCount: 150,
 
+      isLoading: false,
+      error: null,
+
       startDayWorkout: (templateId, dayId) => {
         const { currentTemplate, historyTemplates } = get();
         let targetTemplate: WorkoutTemplate | undefined;
 
-        if (currentTemplate.id === templateId) {
+        if (currentTemplate?.id === templateId) {
           targetTemplate = currentTemplate;
         } else {
           targetTemplate = historyTemplates.find((t) => t.id === templateId);
@@ -303,6 +195,45 @@ export const useWorkoutStore = create<WorkoutState>()(
           startTime: null,
           endTime: null,
         });
+      },
+
+      fetchWorkouts: async () => {
+        const { token, user } = useAuthStore.getState();
+
+        if (!token || !user?.id) {
+          set({ currentTemplate: null, historyTemplates: [], isLoading: false, error: null });
+          return;
+        }
+
+        set({ isLoading: true, error: null });
+
+        try {
+          const [currentRes, historyRes] = await Promise.all([
+            fetchCurrentWorkoutTemplateApi(token, user.id),
+            fetchAssignedWorkoutTemplatesApi(token, user.id),
+          ]);
+
+          const currentTemplate = currentRes.data?.workoutTemplate || null;
+          const allAssigned = Array.isArray(historyRes.data) 
+            ? historyRes.data.map((assignment: any) => assignment.workoutTemplate).filter(Boolean)
+            : [];
+
+          const historyTemplates = currentTemplate
+            ? allAssigned.filter((t) => t.id !== currentTemplate.id)
+            : allAssigned;
+
+          set({
+            currentTemplate,
+            historyTemplates,
+            isLoading: false,
+            error: null,
+          });
+        } catch (err: any) {
+          set({
+            isLoading: false,
+            error: err?.message || 'Failed to connect to workout service',
+          });
+        }
       },
     }),
     {

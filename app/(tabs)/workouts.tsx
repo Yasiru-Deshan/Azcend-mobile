@@ -1,6 +1,6 @@
-import { useRouter } from 'expo-router';
+import { useFocusEffect, useRouter } from 'expo-router';
 import { History } from 'lucide-react-native';
-import React from 'react';
+import React, { useCallback } from 'react';
 import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
@@ -13,10 +13,17 @@ import { useWorkoutStore } from '@/src/store/workout.store';
 const C = Colors.dark;
 
 export default function WorkoutsTab() {
-  const { currentTemplate, startDayWorkout } = useWorkoutStore();
+  const { currentTemplate, startDayWorkout, isLoading, fetchWorkouts } = useWorkoutStore();
   const router = useRouter();
 
+  useFocusEffect(
+    useCallback(() => {
+      fetchWorkouts();
+    }, [fetchWorkouts])
+  );
+
   const handleStartWorkout = (dayId: string) => {
+    if (!currentTemplate) return;
     startDayWorkout(currentTemplate.id, dayId);
     router.push('/workouts/session');
   };
@@ -39,21 +46,36 @@ export default function WorkoutsTab() {
           }
         />
 
-        <ProgramOverviewCard template={currentTemplate} />
-
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Weekly Schedule</Text>
-          <View style={styles.cardStack}>
-            {currentTemplate.days.map((day, index) => (
-              <WorkoutDaySection
-                key={day.id}
-                day={day}
-                defaultExpanded={index === 0}
-                onStartWorkout={() => handleStartWorkout(day.id)}
-              />
-            ))}
+        {isLoading ? (
+          <View style={{ padding: Spacing.xl, alignItems: 'center' }}>
+            <Text style={{ color: C.textMuted }}>Loading workout plan...</Text>
           </View>
-        </View>
+        ) : !currentTemplate ? (
+          <View style={{ padding: Spacing.xl, alignItems: 'center', backgroundColor: C.surface, borderRadius: Radius.lg }}>
+            <Text style={{ ...Typography.h3, color: C.text, marginBottom: Spacing.sm }}>No Active Program</Text>
+            <Text style={{ ...Typography.body, color: C.textMuted, textAlign: 'center' }}>
+              Your coach hasn't assigned a program yet, or you haven't started one.
+            </Text>
+          </View>
+        ) : (
+          <>
+            <ProgramOverviewCard template={currentTemplate} />
+
+            <View style={styles.section}>
+              <Text style={styles.sectionTitle}>Weekly Schedule</Text>
+              <View style={styles.cardStack}>
+                {currentTemplate.days.map((day, index) => (
+                  <WorkoutDaySection
+                    key={day.id}
+                    day={day}
+                    defaultExpanded={index === 0}
+                    onStartWorkout={() => handleStartWorkout(day.id)}
+                  />
+                ))}
+              </View>
+            </View>
+          </>
+        )}
       </ScrollView>
     </SafeAreaView>
   );

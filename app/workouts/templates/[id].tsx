@@ -14,7 +14,7 @@ export default function WorkoutTemplateDetailScreen() {
   const { historyTemplates, currentTemplate } = useWorkoutStore();
 
   const template =
-    currentTemplate.id === id
+    currentTemplate?.id === id
       ? currentTemplate
       : historyTemplates.find((t) => t.id === id);
 

@@ -1,5 +1,5 @@
-import { useRouter } from 'expo-router';
-import React from 'react';
+import { useFocusEffect, useRouter } from 'expo-router';
+import React, { useCallback } from 'react';
 import { ScrollView, StatusBar, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
@@ -25,18 +25,32 @@ export default function HomeScreen() {
     currentTemplate,
     startDayWorkout,
     workoutStarted,
+    isLoading,
+    fetchWorkouts,
   } = useWorkoutStore();
 
   const router = useRouter();
 
-  const todaysWorkout = {
+  useFocusEffect(
+    useCallback(() => {
+      fetchWorkouts();
+    }, [fetchWorkouts])
+  );
+
+  const todaysWorkout = currentTemplate ? {
     title: currentTemplate.days[0]?.name ?? 'Upper Body Strength',
     estTime: `${currentTemplate.durationMinutes} min`,
+  } : {
+    title: 'No active program',
+    estTime: '--',
   };
 
-  const upNext = {
+  const upNext = currentTemplate ? {
     title: currentTemplate.days[1]?.name ?? 'Lower Body Strength',
     subtitle: `Next Session • ${currentTemplate.durationMinutes} min`,
+  } : {
+    title: '--',
+    subtitle: 'No upcoming sessions',
   };
 
   return (
@@ -59,7 +73,7 @@ export default function HomeScreen() {
             estTime={todaysWorkout.estTime}
             isStarted={workoutStarted}
             onStart={() => {
-              if (!workoutStarted && currentTemplate.days[0]) {
+              if (!workoutStarted && currentTemplate?.days[0]) {
                 startDayWorkout(currentTemplate.id, currentTemplate.days[0].id);
               }
             }}
