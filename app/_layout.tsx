@@ -20,6 +20,8 @@ export default function RootLayout() {
         <Stack.Screen name="modal" options={{ presentation: 'modal', title: 'Modal' }} />
         <Stack.Screen name="workouts/history" options={{ title: 'Workout History', headerBackTitle: 'Back' }} />
         <Stack.Screen name="workouts/templates/[id]" options={{ title: 'Program Details', headerBackTitle: 'Back' }} />
+        <Stack.Screen name="workouts/session" options={{ headerShown: false }} />
+        <Stack.Screen name="workouts/exercises/[id]" options={{ headerShown: false }} />
         <Stack.Screen name="meals/history" options={{ title: 'Meal Plan History', headerBackTitle: 'Back' }} />
         <Stack.Screen name="meals/plans/[id]" options={{ title: 'Meal Plan Details', headerBackTitle: 'Back' }} />
         <Stack.Screen name="weekly-checkin/history" options={{ title: 'Check-in History', headerBackTitle: 'Back' }} />
