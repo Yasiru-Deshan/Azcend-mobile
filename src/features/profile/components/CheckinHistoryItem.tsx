@@ -1,9 +1,10 @@
 import { Colors, Radius, Spacing } from '@/constants/theme';
-import { Calendar, Eye } from 'lucide-react-native';
-import React from 'react';
+import { Calendar, ChevronDown, ChevronUp, Eye } from 'lucide-react-native';
+import React, { useState } from 'react';
 import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import type { CheckinProgressData } from '../types';
+import { CHECKIN_QUESTIONS } from '../../checkin/constants';
 import { CHECKIN_PHOTO_VIEWS } from '../constants';
+import type { CheckinProgressData } from '../types';
 
 const C = Colors.dark;
 
@@ -14,6 +15,7 @@ export interface CheckinHistoryItemProps {
 }
 
 export const CheckinHistoryItem = ({ checkin, checkinIndex, onSelectPhoto }: CheckinHistoryItemProps) => {
+  const [isQuestionsExpanded, setIsQuestionsExpanded] = useState(false);
   const photos = checkin.photos || {
     front: 'https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?q=80&w=800&auto=format&fit=crop',
     back: 'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?q=80&w=800&auto=format&fit=crop',
@@ -62,6 +64,42 @@ export const CheckinHistoryItem = ({ checkin, checkinIndex, onSelectPhoto }: Che
             );
           })}
         </View>
+        {checkin.questions && checkin.questions.length > 0 && (
+          <View style={styles.questionsContainer}>
+            <TouchableOpacity
+              activeOpacity={0.7}
+              style={styles.questionsHeader}
+              onPress={() => setIsQuestionsExpanded(!isQuestionsExpanded)}
+            >
+              <Text style={styles.questionsTitle}>Q&A</Text>
+              {isQuestionsExpanded ? (
+                <ChevronUp size={20} color={C.textMuted} />
+              ) : (
+                <ChevronDown size={20} color={C.textMuted} />
+              )}
+            </TouchableOpacity>
+
+            {isQuestionsExpanded && (
+              <View style={styles.questionsContent}>
+                {checkin.questions.map((q) => {
+                  const realQuestion = CHECKIN_QUESTIONS.find(c => c.id === (q.id || q.question))?.question || q.question;
+                  return (
+                    <View key={q.id} style={styles.qnaItem}>
+                      <Text style={styles.questionText}>{realQuestion}</Text>
+                      <Text style={styles.answerText}>{q.answer || 'No answer provided.'}</Text>
+                    </View>
+                  );
+                })}
+              </View>
+            )}
+          </View>
+        )}
+        {checkin.feedback ? (
+          <View style={styles.feedbackContainer}>
+            <Text style={styles.feedbackTitle}>Feedback</Text>
+            <Text style={styles.feedbackText}>{checkin.feedback}</Text>
+          </View>
+        ) : null}
       </View>
     </View>
   );
@@ -137,5 +175,61 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     opacity: 0.8,
+  },
+  feedbackContainer: {
+    marginTop: Spacing.md,
+    padding: Spacing.md,
+    backgroundColor: 'rgba(255,255,255,0.03)',
+    borderRadius: Radius.md,
+    borderWidth: 1,
+    borderColor: C.cardBorder,
+  },
+  feedbackTitle: {
+    fontSize: 13,
+    fontWeight: '600',
+    color: C.primary,
+    marginBottom: Spacing.xs,
+  },
+  feedbackText: {
+    fontSize: 14,
+    color: C.text,
+    lineHeight: 20,
+  },
+  questionsContainer: {
+    marginTop: Spacing.md,
+    backgroundColor: 'rgba(255,255,255,0.02)',
+    borderRadius: Radius.md,
+    borderWidth: 1,
+    borderColor: C.cardBorder,
+    overflow: 'hidden',
+  },
+  questionsHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    padding: Spacing.md,
+  },
+  questionsTitle: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: C.text,
+  },
+  questionsContent: {
+    padding: Spacing.md,
+    paddingTop: 0,
+    gap: Spacing.md,
+  },
+  qnaItem: {
+    gap: 4,
+  },
+  questionText: {
+    fontSize: 13,
+    fontWeight: '500',
+    color: C.textMuted,
+  },
+  answerText: {
+    fontSize: 14,
+    color: C.text,
+    lineHeight: 20,
   },
 });

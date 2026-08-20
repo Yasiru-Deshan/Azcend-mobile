@@ -1,23 +1,39 @@
 import { Colors, Radius, Spacing } from '@/constants/theme';
 import { Camera } from 'lucide-react-native';
-import React, { useState } from 'react';
+import React from 'react';
 import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import * as ImagePicker from 'expo-image-picker';
 import { CheckinStepHeader } from './CheckinStepHeader';
 
 const C = Colors.dark;
 
-export const CheckinPhotosStep = () => {
-  const [selectedPhotos, setSelectedPhotos] = useState<Record<string, string | null>>({
-    front: null,
-    back: null,
-    side: null,
-  });
+interface CheckinPhotosStepProps {
+  photos: Record<string, string | null>;
+  onPhotosChange: (photos: Record<string, string | null>) => void;
+}
 
-  const handlePhotoClick = (type: string) => {
-    setSelectedPhotos(prev => ({
-      ...prev,
-      [type]: prev[type] ? null : 'https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?q=80&w=2070&auto=format&fit=crop'
-    }));
+export const CheckinPhotosStep = ({ photos, onPhotosChange }: CheckinPhotosStepProps) => {
+  const handlePhotoClick = async (type: string) => {
+    const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    
+    if (permissionResult.granted === false) {
+      alert("You've refused to allow this app to access your photos!");
+      return;
+    }
+
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      aspect: [9, 16],
+      quality: 0.8,
+    });
+
+    if (!result.canceled) {
+      onPhotosChange({
+        ...photos,
+        [type]: result.assets[0].uri
+      });
+    }
   };
 
   const photoTypes = [
@@ -43,10 +59,10 @@ export const CheckinPhotosStep = () => {
               onPress={() => handlePhotoClick(type.id)}
               style={styles.photoBox}
             >
-              {selectedPhotos[type.id] ? (
+              {photos[type.id] ? (
                 <>
                   <Image
-                    source={{ uri: selectedPhotos[type.id]! }}
+                    source={{ uri: photos[type.id]! }}
                     style={styles.image}
                   />
                   <View style={styles.changeOverlay}>

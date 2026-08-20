@@ -26,4 +26,6 @@ export interface CheckinProgressData {
   glutes?: number;
   thigh?: number;
   photos?: CheckinProgressPhotos;
+  feedback?: string;
+  questions?: { id: string; question: string; answer: string }[];
 }

@@ -1,13 +1,39 @@
 import { Colors, Spacing } from '@/constants/theme';
 import { CheckinHistoryList } from '@/src/features/profile/components/CheckinHistoryList';
-import { mockCheckinHistory } from '@/src/features/profile/mockData';
-import React from 'react';
-import { ScrollView, StyleSheet, Text, View } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { ScrollView, StyleSheet, Text, View, ActivityIndicator } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+
+import { useAuthStore } from '@/src/store/auth.store';
+import { fetchClientCheckinsApi } from '@/src/services/checkin.service';
+import type { CheckinProgressData } from '@/src/features/profile/types';
 
 const C = Colors.dark;
 
 export default function CheckinHistoryScreen() {
+  const { profile, token } = useAuthStore();
+  const [checkins, setCheckins] = useState<CheckinProgressData[]>([]);
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    const loadCheckins = async () => {
+      if (!profile?.id || !token) return;
+      setLoading(true);
+      try {
+        const response = await fetchClientCheckinsApi(profile.id, token);
+        if (response.data) {
+          setCheckins(response.data);
+        }
+      } catch (error) {
+        console.error('Failed to load history checkins', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadCheckins();
+  }, [profile?.id, token]);
+
   return (
     <SafeAreaView style={styles.safeArea} edges={['bottom', 'left', 'right']}>
       <ScrollView
@@ -18,11 +44,15 @@ export default function CheckinHistoryScreen() {
         <View style={styles.header}>
           <Text style={styles.sectionSubtitle}>All Check-ins</Text>
           <View style={styles.badge}>
-            <Text style={styles.badgeText}>{mockCheckinHistory.length} check-ins</Text>
+            <Text style={styles.badgeText}>{loading ? '...' : checkins.length} check-ins</Text>
           </View>
         </View>
 
-        <CheckinHistoryList data={mockCheckinHistory} />
+        {loading ? (
+          <ActivityIndicator size="large" color={C.primary} style={{ marginTop: 40 }} />
+        ) : (
+          <CheckinHistoryList data={checkins} />
+        )}
       </ScrollView>
     </SafeAreaView>
   );
