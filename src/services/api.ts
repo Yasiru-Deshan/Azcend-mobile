@@ -45,3 +45,40 @@ export async function apiRequest<T = any>(
     };
   }
 }
+
+/**
+ * for multipart/FormData uploads.
+ */
+export async function apiMultipartRequest<T = any>(
+  endpoint: string,
+  formData: FormData,
+  token?: string | null,
+): Promise<ApiResponse<T>> {
+  const url = `${API_BASE_URL.replace(/\/$/, '')}/${endpoint.replace(/^\//, '')}`;
+
+  try {
+    const response = await fetch(url, {
+      method: 'POST',
+      body: formData,
+      headers: {
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      },
+    });
+
+    const data = await response.json().catch(() => null);
+
+    if (!response.ok) {
+      return {
+        error: data?.message || data?.error || 'An error occurred during request',
+        status: response.status,
+      };
+    }
+
+    return { data, status: response.status };
+  } catch (err: any) {
+    return {
+      error: err?.message || 'Network request failed',
+      status: 0,
+    };
+  }
+}

@@ -2,26 +2,48 @@ import { Colors, Radius, Spacing, Typography } from '@/constants/theme';
 import { ScreenHeader } from '@/src/components/ScreenHeader';
 import { ProfileAboutCard } from '@/src/features/profile/components/ProfileAboutCard';
 import { ProfileProgressSection } from '@/src/features/profile/components/ProfileProgressSection';
-import { mockCheckinHistory } from '@/src/features/profile/mockData';
 import { useRouter } from 'expo-router';
 import { Camera, ChevronRight } from 'lucide-react-native';
-import React, { useEffect } from 'react';
-import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { ScrollView, StyleSheet, Text, TouchableOpacity, View, ActivityIndicator } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { useAuthStore } from '@/src/store/auth.store';
+import { fetchClientCheckinsApi } from '@/src/services/checkin.service';
+import type { CheckinProgressData } from '@/src/features/profile/types';
 
 const C = Colors.dark;
 
 export default function ProfileTabScreen() {
   const router = useRouter();
-  const { profile, isAuthenticated, logout } = useAuthStore();
+  const { profile, isAuthenticated, token, logout } = useAuthStore();
+  const [checkins, setCheckins] = useState<CheckinProgressData[]>([]);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     if (!isAuthenticated) {
       router.replace('/login');
     }
   }, [isAuthenticated]);
+
+  useEffect(() => {
+    const loadCheckins = async () => {
+      if (!profile?.id || !token) return;
+      setLoading(true);
+      try {
+        const response = await fetchClientCheckinsApi(profile.id, token);
+        if (response.data) {
+          setCheckins(response.data);
+        }
+      } catch (error) {
+        console.error('Failed to load checkins', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadCheckins();
+  }, [profile?.id, token]);
 
   const handleLogout = async () => {
     await logout();
@@ -62,7 +84,11 @@ export default function ProfileTabScreen() {
           <ChevronRight size={22} color={C.textMuted} />
         </TouchableOpacity>
 
-        <ProfileProgressSection data={mockCheckinHistory} />
+        {loading ? (
+          <ActivityIndicator size="large" color={C.primary} style={{ marginTop: 20 }} />
+        ) : (
+          <ProfileProgressSection data={checkins} />
+        )}
       </ScrollView>
     </SafeAreaView>
   );

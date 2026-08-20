@@ -6,11 +6,14 @@ import { Colors, Spacing, Radius } from '@/constants/theme';
 
 const C = Colors.dark;
 
-export const CheckinQuestionsStep = () => {
-  const [answers, setAnswers] = useState<Record<string, string>>({});
+interface CheckinQuestionsStepProps {
+  questions: Record<string, string>;
+  onQuestionsChange: (questions: Record<string, string>) => void;
+}
 
+export const CheckinQuestionsStep = ({ questions, onQuestionsChange }: CheckinQuestionsStepProps) => {
   const updateAnswer = (id: string, text: string) => {
-    setAnswers(prev => ({ ...prev, [id]: text }));
+    onQuestionsChange({ ...questions, [id]: text });
   };
 
   return (
@@ -30,7 +33,7 @@ export const CheckinQuestionsStep = () => {
               placeholderTextColor={C.textSubtle}
               multiline
               textAlignVertical="top"
-              value={answers[q.id] || ''}
+              value={questions[q.id] || ''}
               onChangeText={(text) => updateAnswer(q.id, text)}
             />
           </View>

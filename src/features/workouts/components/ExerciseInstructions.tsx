@@ -11,6 +11,8 @@ interface ExerciseInstructionsProps {
 }
 
 export const ExerciseInstructions = ({ exercise }: ExerciseInstructionsProps) => {
+  if (!exercise.instructions) return null;
+
   return (
     <View style={styles.card}>
       <View style={styles.header}>

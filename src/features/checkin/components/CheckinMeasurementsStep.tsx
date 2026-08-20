@@ -6,15 +6,19 @@ import { CheckinStepHeader } from './CheckinStepHeader';
 
 const C = Colors.dark;
 
-export const CheckinMeasurementsStep = () => {
+interface CheckinMeasurementsStepProps {
+  measurements: Record<string, string>;
+  onMeasurementsChange: (measurements: Record<string, string>) => void;
+}
+
+export const CheckinMeasurementsStep = ({ measurements, onMeasurementsChange }: CheckinMeasurementsStepProps) => {
   const [unitSystem, setUnitSystem] = useState<UnitSystem>('metric');
-  const [measurements, setMeasurements] = useState<Record<string, string>>({});
 
   const weightUnit = unitSystem === 'metric' ? 'kg' : 'lbs';
   const sizeUnit = unitSystem === 'metric' ? 'cm' : 'in';
 
   const updateMeasurement = (id: string, value: string) => {
-    setMeasurements(prev => ({ ...prev, [id]: value }));
+    onMeasurementsChange({ ...measurements, [id]: value });
   };
 
   return (
