@@ -22,13 +22,6 @@ export const ExerciseRow = ({ exercise, index }: ExerciseRowProps) => {
           <Text style={styles.metaText}>{exercise.sets} Sets</Text>
           <Text style={styles.metaDot}>•</Text>
           <Text style={styles.metaText}>{exercise.reps}</Text>
-          <Text style={styles.metaDot}>•</Text>
-          <Text style={[
-            styles.weightMode,
-            exercise.weightMode === 'HWLR' ? styles.hwlr : styles.lwhr
-          ]}>
-            {exercise.weightMode}
-          </Text>
         </View>
       </View>
     </View>
@@ -44,7 +37,4 @@ const styles = StyleSheet.create({
   exerciseMeta:    { flexDirection: 'row', alignItems: 'center', gap: 5 },
   metaText:        { fontSize: 10, fontWeight: '600', color: C.textMuted, textTransform: 'uppercase', letterSpacing: 0.5 },
   metaDot:         { fontSize: 10, color: C.textSubtle },
-  weightMode:      { fontSize: 10, fontWeight: '800', textTransform: 'uppercase', letterSpacing: 0.5 },
-  hwlr:            { color: '#f59e0b' },
-  lwhr:            { color: '#06b6d4' },
 });

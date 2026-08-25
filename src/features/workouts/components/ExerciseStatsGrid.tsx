@@ -10,8 +10,6 @@ interface ExerciseStatsGridProps {
 }
 
 export const ExerciseStatsGrid = ({ exercise }: ExerciseStatsGridProps) => {
-  const isHwlr = exercise.weightMode === 'HWLR';
-
   return (
     <View style={styles.grid}>
       <View style={styles.col}>
@@ -19,18 +17,9 @@ export const ExerciseStatsGrid = ({ exercise }: ExerciseStatsGridProps) => {
         <Text style={styles.val}>{exercise.sets}</Text>
       </View>
 
-      <View style={[styles.col, styles.borderSides]}>
+      <View style={[styles.col, styles.borderLeft]}>
         <Text style={styles.label}>REPS</Text>
         <Text style={styles.val}>{exercise.reps.replace(' reps', '')}</Text>
-      </View>
-
-      <View style={styles.col}>
-        <Text style={styles.label}>MODE</Text>
-        <View style={[styles.modeChip, isHwlr ? styles.hwlrChip : styles.lwhrChip]}>
-          <Text style={[styles.modeText, isHwlr ? styles.hwlrText : styles.lwhrText]}>
-            {exercise.weightMode}
-          </Text>
-        </View>
       </View>
     </View>
   );
@@ -53,9 +42,8 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     gap: 6,
   },
-  borderSides: {
+  borderLeft: {
     borderLeftWidth: 1,
-    borderRightWidth: 1,
     borderColor: C.cardBorder,
   },
   label: {
@@ -70,19 +58,5 @@ const styles = StyleSheet.create({
     fontWeight: '800',
     color: C.text,
   },
-  modeChip: {
-    paddingHorizontal: 8,
-    paddingVertical: 2,
-    borderRadius: 4,
-  },
-  modeText: {
-    fontSize: 11,
-    fontWeight: '800',
-    textTransform: 'uppercase',
-    letterSpacing: 0.5,
-  },
-  hwlrChip: { backgroundColor: 'rgba(245,158,11,0.1)' },
-  lwhrChip: { backgroundColor: 'rgba(6,182,212,0.1)' },
-  hwlrText: { color: '#f59e0b' },
-  lwhrText: { color: '#06b6d4' },
 });
+

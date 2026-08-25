@@ -14,7 +14,6 @@ export interface Exercise {
   sets: number;
   reps: string;
   restSeconds: number;
-  weightMode: 'HWLR' | 'LWHR';
   instructions: string;
   videoUrl: string;
   imageUrl: string;

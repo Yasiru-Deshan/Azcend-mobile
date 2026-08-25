@@ -48,17 +48,6 @@ export const SessionExerciseItem = ({ exercise, status, onPress }: SessionExerci
           <View style={styles.metaChip}>
             <Text style={styles.metaChipText}>{exercise.reps.replace(' reps', '')} Reps</Text>
           </View>
-          <View style={[
-            styles.metaChip,
-            exercise.weightMode === 'HWLR' ? styles.hwlrChip : styles.lwhrChip,
-          ]}>
-            <Text style={[
-              styles.metaChipText,
-              exercise.weightMode === 'HWLR' ? styles.hwlrText : styles.lwhrText,
-            ]}>
-              {exercise.weightMode}
-            </Text>
-          </View>
         </View>
       </View>
 
@@ -95,10 +84,6 @@ const styles = StyleSheet.create({
   metaRow: { flexDirection: 'row', gap: 5, flexWrap: 'wrap' },
   metaChip: { paddingHorizontal: 6, paddingVertical: 2, borderRadius: 4, backgroundColor: C.surface },
   metaChipText: { fontSize: 9, fontWeight: '700', color: C.textMuted, textTransform: 'uppercase', letterSpacing: 0.4 },
-  hwlrChip: { backgroundColor: 'rgba(245,158,11,0.1)' },
-  lwhrChip: { backgroundColor: 'rgba(6,182,212,0.1)' },
-  hwlrText: { color: '#f59e0b' },
-  lwhrText: { color: '#06b6d4' },
   actionGroup: { flexDirection: 'row', alignItems: 'center', gap: 4 },
   startBtn: { paddingHorizontal: 10, paddingVertical: 5, borderRadius: 7, backgroundColor: C.primary },
   startBtnText: { fontSize: 11, fontWeight: '700', color: C.primaryFg },
