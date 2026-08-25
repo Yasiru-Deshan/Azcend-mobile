@@ -1,9 +1,11 @@
 import { Colors, Radius } from '@/constants/theme';
+import { useSignedUrl } from '@/src/hooks/useSignedUrl';
 import type { Exercise } from '@/src/store/workout.store';
 import { Image } from 'expo-image';
+import { useVideoPlayer, VideoView } from 'expo-video';
 import { PlayCircle } from 'lucide-react-native';
-import React from 'react';
-import { StyleSheet, View, Linking, TouchableOpacity } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { Linking, StyleSheet, TouchableOpacity, View } from 'react-native';
 
 const C = Colors.dark;
 
@@ -12,38 +14,75 @@ interface ExerciseMediaCardProps {
 }
 
 export const ExerciseMediaCard = ({ exercise }: ExerciseMediaCardProps) => {
-  if (!exercise.imageUrl && !exercise.videoUrl) return null;
+  const [isPlaying, setIsPlaying] = useState(false);
+
+  const { data: videoUrl } = useSignedUrl(exercise.videoUrl);
+  const { data: imageUrl } = useSignedUrl(exercise.imageUrl);
+
+  const player = useVideoPlayer(videoUrl || null, player => {
+    player.loop = true;
+  });
+
+  useEffect(() => {
+    if (isPlaying) {
+      player.play();
+    } else {
+      player.pause();
+    }
+  }, [isPlaying, player]);
+
+  if (!imageUrl && !videoUrl) return null;
 
   const handlePress = () => {
-    if (exercise.videoUrl) {
-      Linking.openURL(exercise.videoUrl).catch(() => {});
+    if (!videoUrl) return;
+
+    if (videoUrl.includes('youtube.com') || videoUrl.includes('youtu.be')) {
+      Linking.openURL(videoUrl).catch(() => { });
+      return;
     }
+
+    setIsPlaying(true);
   };
 
   return (
-    <TouchableOpacity 
-      style={styles.card} 
-      onPress={handlePress}
-      activeOpacity={exercise.videoUrl ? 0.8 : 1}
-      disabled={!exercise.videoUrl}
-    >
-      {exercise.imageUrl ? (
-        <Image
-          source={{ uri: exercise.imageUrl }}
-          style={styles.image}
-          contentFit="cover"
-          transition={300}
-        />
-      ) : (
-        <View style={[styles.image, { backgroundColor: C.surface }]} />
-      )}
+    <View style={styles.card}>
+      {videoUrl ? (
+        <TouchableOpacity
+          style={styles.media}
+          onPress={isPlaying ? undefined : handlePress}
+          activeOpacity={isPlaying ? 1 : 0.8}
+        >
+          <View pointerEvents={isPlaying ? 'auto' : 'none'} style={styles.media}>
+            <VideoView
+              style={styles.media}
+              player={player}
+              allowsFullscreen
+              allowsPictureInPicture
+              nativeControls={isPlaying}
+            />
+          </View>
 
-      {exercise.videoUrl && (
-        <View style={styles.overlay}>
-          <PlayCircle size={48} color="rgba(255,255,255,0.7)" strokeWidth={1.5} />
+          {!isPlaying && (
+            <View style={styles.overlay} pointerEvents="none">
+              <PlayCircle size={48} color="rgba(255,255,255,0.7)" strokeWidth={1.5} />
+            </View>
+          )}
+        </TouchableOpacity>
+      ) : (
+        <View style={styles.media}>
+          {imageUrl ? (
+            <Image
+              source={{ uri: imageUrl }}
+              style={styles.media}
+              contentFit="cover"
+              transition={300}
+            />
+          ) : (
+            <View style={[styles.media, { backgroundColor: C.surface }]} />
+          )}
         </View>
       )}
-    </TouchableOpacity>
+    </View>
   );
 };
 
@@ -58,7 +97,7 @@ const styles = StyleSheet.create({
     width: '100%',
     elevation: 2,
   },
-  image: {
+  media: {
     flex: 1,
     width: '100%',
     height: '100%',

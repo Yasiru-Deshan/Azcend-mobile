@@ -3,6 +3,8 @@ import type { Exercise } from '@/src/store/workout.store';
 import { Check, ChevronRight } from 'lucide-react-native';
 import React from 'react';
 import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { useVideoThumbnail } from '@/src/hooks/useVideoThumbnail';
+import { useSignedUrl } from '@/src/hooks/useSignedUrl';
 
 const C = Colors.dark;
 
@@ -16,6 +18,11 @@ export const SessionExerciseItem = ({ exercise, status, onPress }: SessionExerci
   const isCompleted = status === 'completed';
   const isInProgress = status === 'in-progress';
 
+  const { data: imageUrl } = useSignedUrl(exercise.imageUrl);
+  const { data: videoUrl } = useSignedUrl(exercise.videoUrl);
+
+  const generatedThumbnail = useVideoThumbnail(videoUrl);
+
   return (
     <TouchableOpacity
       style={[styles.card, isCompleted && styles.cardCompleted]}
@@ -24,7 +31,7 @@ export const SessionExerciseItem = ({ exercise, status, onPress }: SessionExerci
     >
       <View style={styles.thumbWrapper}>
         <Image
-          source={{ uri: exercise.imageUrl }}
+          source={generatedThumbnail || (imageUrl ? { uri: imageUrl } : undefined)}
           style={[styles.thumb, isCompleted && styles.thumbDim]}
         />
         {isCompleted && (
