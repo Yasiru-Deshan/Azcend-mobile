@@ -1,38 +1,16 @@
 import { Colors, Spacing } from '@/constants/theme';
 import { CheckinHistoryList } from '@/src/features/profile/components/CheckinHistoryList';
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { ScrollView, StyleSheet, Text, View, ActivityIndicator } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import { useAuthStore } from '@/src/store/auth.store';
-import { fetchClientCheckinsApi } from '@/src/services/checkin.service';
-import type { CheckinProgressData } from '@/src/features/profile/types';
+import { useCheckinsQuery } from '@/src/hooks/useCheckinsQuery';
 
 const C = Colors.dark;
 
 export default function CheckinHistoryScreen() {
-  const { profile, token } = useAuthStore();
-  const [checkins, setCheckins] = useState<CheckinProgressData[]>([]);
-  const [loading, setLoading] = useState(false);
-
-  useEffect(() => {
-    const loadCheckins = async () => {
-      if (!profile?.id || !token) return;
-      setLoading(true);
-      try {
-        const response = await fetchClientCheckinsApi(profile.id, token);
-        if (response.data) {
-          setCheckins(response.data);
-        }
-      } catch (error) {
-        console.error('Failed to load history checkins', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    loadCheckins();
-  }, [profile?.id, token]);
+  const { data, isPending: loading } = useCheckinsQuery();
+  const checkins = data ?? [];
 
   return (
     <SafeAreaView style={styles.safeArea} edges={['bottom', 'left', 'right']}>

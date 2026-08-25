@@ -1,12 +1,43 @@
 import { Colors, Radius, Spacing } from '@/constants/theme';
 import { Calendar, ChevronDown, ChevronUp, Eye } from 'lucide-react-native';
 import React, { useState } from 'react';
-import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { SignedImage } from '../../../components/SignedImage';
+import { useSignedUrl } from '../../../hooks/useSignedUrl';
 import { CHECKIN_QUESTIONS } from '../../checkin/constants';
 import { CHECKIN_PHOTO_VIEWS } from '../constants';
 import type { CheckinProgressData } from '../types';
 
 const C = Colors.dark;
+
+interface PhotoCellProps {
+  s3Key: string;
+  label: string;
+  formattedDate: string;
+  onSelectPhoto: (photo: { url: string; label: string; date: string }) => void;
+}
+
+const PhotoCell = ({ s3Key, label, formattedDate, onSelectPhoto }: PhotoCellProps) => {
+  const { data: url } = useSignedUrl(s3Key);
+
+  return (
+    <View style={styles.photoColumn}>
+      <Text style={styles.photoLabel}>{label}</Text>
+      <TouchableOpacity
+        activeOpacity={0.8}
+        style={styles.photoWrapper}
+        onPress={() => {
+          if (url) onSelectPhoto({ url, label, date: formattedDate });
+        }}
+      >
+        <SignedImage s3Key={s3Key} style={styles.photo} />
+        <View style={styles.overlay}>
+          <Eye size={16} color="#ffffff" />
+        </View>
+      </TouchableOpacity>
+    </View>
+  );
+};
 
 export interface CheckinHistoryItemProps {
   checkin: CheckinProgressData;
@@ -45,24 +76,15 @@ export const CheckinHistoryItem = ({ checkin, checkinIndex, onSelectPhoto }: Che
 
       <View style={styles.content}>
         <View style={styles.photoGrid}>
-          {CHECKIN_PHOTO_VIEWS.map((view) => {
-            const imageUrl = photos[view.key];
-            return (
-              <View key={view.key} style={styles.photoColumn}>
-                <Text style={styles.photoLabel}>{view.label}</Text>
-                <TouchableOpacity
-                  activeOpacity={0.8}
-                  style={styles.photoWrapper}
-                  onPress={() => onSelectPhoto({ url: imageUrl, label: view.label, date: formattedDate })}
-                >
-                  <Image source={{ uri: imageUrl }} style={styles.photo} />
-                  <View style={styles.overlay}>
-                    <Eye size={16} color="#ffffff" />
-                  </View>
-                </TouchableOpacity>
-              </View>
-            );
-          })}
+          {CHECKIN_PHOTO_VIEWS.map((view) => (
+            <PhotoCell
+              key={view.key}
+              s3Key={photos[view.key]}
+              label={view.label}
+              formattedDate={formattedDate}
+              onSelectPhoto={onSelectPhoto}
+            />
+          ))}
         </View>
         {checkin.questions && checkin.questions.length > 0 && (
           <View style={styles.questionsContainer}>

@@ -75,13 +75,14 @@ export default function WeeklyCheckinPostScreen() {
         })),
       }));
 
-      const token = useAuthStore.getState().token;
-      const result = await apiMultipartRequest('checkin', formData, token);
+      const authState = useAuthStore.getState();
+      const result = await apiMultipartRequest('checkin', formData, authState.token);
 
       if (result.error) {
         throw new Error(result.error);
       }
 
+      await authState.fetchProfile();
       setIsSuccess(true);
     } catch (error) {
       console.error(error);

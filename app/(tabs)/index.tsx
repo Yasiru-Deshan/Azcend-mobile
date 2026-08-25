@@ -12,30 +12,25 @@ import { WeeklyCheckinCard } from '@/src/features/dashboard/components/WeeklyChe
 import { WeeklyStatsCards } from '@/src/features/dashboard/components/WeeklyStatsCards';
 import { useAuthStore } from '@/src/store/auth.store';
 import { useWorkoutStore } from '@/src/store/workout.store';
+import { useWorkoutsQuery } from '@/src/hooks/useWorkoutsQuery';
 
 const C = Colors.dark;
 
 export default function HomeScreen() {
-  const { profile, coach } = useAuthStore();
+  const { profile, coach, user } = useAuthStore();
   const clientName = profile?.name || 'Client';
 
   const {
     completedWorkoutsCount,
     spentMinutesCount,
-    currentTemplate,
     startDayWorkout,
     workoutStarted,
-    isLoading,
-    fetchWorkouts,
   } = useWorkoutStore();
 
-  const router = useRouter();
+  const { data } = useWorkoutsQuery();
+  const currentTemplate = data?.currentTemplate;
 
-  useFocusEffect(
-    useCallback(() => {
-      fetchWorkouts();
-    }, [fetchWorkouts])
-  );
+  const router = useRouter();
 
   const todaysWorkout = currentTemplate ? {
     title: currentTemplate.days[0]?.name ?? 'Upper Body Strength',
@@ -74,12 +69,14 @@ export default function HomeScreen() {
             isStarted={workoutStarted}
             onStart={() => {
               if (!workoutStarted && currentTemplate?.days[0]) {
-                startDayWorkout(currentTemplate.id, currentTemplate.days[0].id);
+                startDayWorkout(currentTemplate.id, currentTemplate.days[0]);
               }
             }}
           />
 
-          <WeeklyCheckinCard onSubmit={() => router.push('/weekly-checkin/post')} />
+          {!user?.isCheckinSubmitted && (
+            <WeeklyCheckinCard onSubmit={() => router.push('/weekly-checkin/post')} />
+          )}
 
           <WeeklyStatsCards
             workouts={completedWorkoutsCount}

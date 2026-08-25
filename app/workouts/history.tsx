@@ -2,14 +2,15 @@ import React from 'react';
 import { ScrollView, View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
-import { useWorkoutStore } from '@/src/store/workout.store';
 import { ProgramOverviewCard } from '@/src/features/workouts/components/ProgramOverviewCard';
+import { useWorkoutsQuery } from '@/src/hooks/useWorkoutsQuery';
 import { Colors, Spacing, Typography } from '@/constants/theme';
 
 const C = Colors.dark;
 
 export default function WorkoutHistoryScreen() {
-  const { historyTemplates } = useWorkoutStore();
+  const { data } = useWorkoutsQuery();
+  const historyTemplates = data?.historyTemplates || [];
   const router = useRouter();
 
   return (

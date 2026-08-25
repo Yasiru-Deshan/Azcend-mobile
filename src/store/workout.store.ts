@@ -1,8 +1,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { makePersistStorage } from './storage';
-import { fetchAssignedWorkoutTemplatesApi, fetchCurrentWorkoutTemplateApi } from '../services/workout.service';
-import { useAuthStore } from './auth.store';
 
 export interface SetLog {
   weight: string;
@@ -39,9 +37,6 @@ export interface WorkoutTemplate {
 }
 
 interface WorkoutState {
-  currentTemplate: WorkoutTemplate | null;
-  historyTemplates: WorkoutTemplate[];
-
   activeTemplateId: string | null;
   activeDayId: string | null;
   activeExercisesState: Record<string, SetLog[]>;
@@ -54,16 +49,12 @@ interface WorkoutState {
   completedWorkoutsCount: number;
   spentMinutesCount: number;
 
-  isLoading: boolean;
-  error: string | null;
-
-  startDayWorkout: (templateId: string, dayId: string) => void;
+  startDayWorkout: (templateId: string, targetDay: WorkoutDay) => void;
   updateSet: (exerciseId: string, setIndex: number, weight: string, reps: string) => void;
   toggleSetCompleted: (exerciseId: string, setIndex: number) => void;
   completeExercise: (exerciseId: string) => void;
   finishWorkout: () => void;
   resetWorkoutState: () => void;
-  fetchWorkouts: () => Promise<void>;
 }
 
 
@@ -71,9 +62,6 @@ interface WorkoutState {
 export const useWorkoutStore = create<WorkoutState>()(
   persist(
     (set, get) => ({
-      currentTemplate: null,
-      historyTemplates: [],
-
       activeTemplateId: null,
       activeDayId: null,
       activeExercisesState: {},
@@ -86,21 +74,7 @@ export const useWorkoutStore = create<WorkoutState>()(
       completedWorkoutsCount: 3,
       spentMinutesCount: 150,
 
-      isLoading: false,
-      error: null,
-
-      startDayWorkout: (templateId, dayId) => {
-        const { currentTemplate, historyTemplates } = get();
-        let targetTemplate: WorkoutTemplate | undefined;
-
-        if (currentTemplate?.id === templateId) {
-          targetTemplate = currentTemplate;
-        } else {
-          targetTemplate = historyTemplates.find((t) => t.id === templateId);
-        }
-
-        if (!targetTemplate) return;
-        const targetDay = targetTemplate.days.find((d) => d.id === dayId);
+      startDayWorkout: (templateId, targetDay) => {
         if (!targetDay) return;
 
         const initialStates: Record<string, SetLog[]> = {};
@@ -117,7 +91,7 @@ export const useWorkoutStore = create<WorkoutState>()(
 
         set({
           activeTemplateId: templateId,
-          activeDayId: dayId,
+          activeDayId: targetDay.id,
           activeExercisesState: initialStates,
           activeExercisesCompleted: initialCompletions,
           workoutStarted: true,
@@ -196,52 +170,11 @@ export const useWorkoutStore = create<WorkoutState>()(
           endTime: null,
         });
       },
-
-      fetchWorkouts: async () => {
-        const { token, user } = useAuthStore.getState();
-
-        if (!token || !user?.id) {
-          set({ currentTemplate: null, historyTemplates: [], isLoading: false, error: null });
-          return;
-        }
-
-        set({ isLoading: true, error: null });
-
-        try {
-          const [currentRes, historyRes] = await Promise.all([
-            fetchCurrentWorkoutTemplateApi(token, user.id),
-            fetchAssignedWorkoutTemplatesApi(token, user.id),
-          ]);
-
-          const currentTemplate = currentRes.data?.workoutTemplate || null;
-          const allAssigned = Array.isArray(historyRes.data) 
-            ? historyRes.data.map((assignment: any) => assignment.workoutTemplate).filter(Boolean)
-            : [];
-
-          const historyTemplates = currentTemplate
-            ? allAssigned.filter((t) => t.id !== currentTemplate.id)
-            : allAssigned;
-
-          set({
-            currentTemplate,
-            historyTemplates,
-            isLoading: false,
-            error: null,
-          });
-        } catch (err: any) {
-          set({
-            isLoading: false,
-            error: err?.message || 'Failed to connect to workout service',
-          });
-        }
-      },
     }),
     {
       name: 'ascend-workout-v3-storage',
       storage: makePersistStorage<WorkoutState>(),
       partialize: (state) => ({
-        currentTemplate: state.currentTemplate,
-        historyTemplates: state.historyTemplates,
         activeTemplateId: state.activeTemplateId,
         activeDayId: state.activeDayId,
         activeExercisesState: state.activeExercisesState,

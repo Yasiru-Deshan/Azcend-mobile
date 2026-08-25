@@ -4,7 +4,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { History, UtensilsCrossed } from 'lucide-react-native';
 import { useRouter, useFocusEffect } from 'expo-router';
 
-import { useMealStore } from '@/src/store/meal.store';
+import { useMealPlansQuery } from '@/src/hooks/useMealPlansQuery';
 import { Colors, Spacing, Typography, Radius } from '@/constants/theme';
 
 import { ScreenHeader } from '@/src/components/ScreenHeader';
@@ -17,13 +17,8 @@ const C = Colors.dark;
 
 export default function MealsTabScreen() {
   const router = useRouter();
-  const { currentPlan, isLoading, fetchAssignedPlans } = useMealStore();
-
-  useFocusEffect(
-    useCallback(() => {
-      fetchAssignedPlans();
-    }, [fetchAssignedPlans])
-  );
+  const { data, isLoading } = useMealPlansQuery();
+  const currentPlan = data?.currentPlan;
 
   if (isLoading && !currentPlan) {
     return (

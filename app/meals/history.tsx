@@ -1,22 +1,17 @@
 import { Colors, Radius, Spacing, Typography } from '@/constants/theme';
-import { useMealStore } from '@/src/store/meal.store';
-import { useFocusEffect, useRouter } from 'expo-router';
+import { useMealPlansQuery } from '@/src/hooks/useMealPlansQuery';
+import { useRouter } from 'expo-router';
 import { Utensils } from 'lucide-react-native';
-import React, { useCallback } from 'react';
+import React from 'react';
 import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 const C = Colors.dark;
 
 export default function MealHistoryScreen() {
-  const { historyPlans, fetchAssignedPlans } = useMealStore();
+  const { data } = useMealPlansQuery();
+  const historyPlans = data?.historyPlans || [];
   const router = useRouter();
-
-  useFocusEffect(
-    useCallback(() => {
-      fetchAssignedPlans();
-    }, [fetchAssignedPlans])
-  );
 
   return (
     <SafeAreaView style={styles.safeArea} edges={['bottom', 'left', 'right']}>

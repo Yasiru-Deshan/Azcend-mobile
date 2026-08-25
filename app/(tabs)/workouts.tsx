@@ -1,6 +1,6 @@
-import { useFocusEffect, useRouter } from 'expo-router';
+import { useRouter } from 'expo-router';
 import { History } from 'lucide-react-native';
-import React, { useCallback } from 'react';
+import React from 'react';
 import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
@@ -8,23 +8,22 @@ import { Colors, Radius, Spacing, Typography } from '@/constants/theme';
 import { ScreenHeader } from '@/src/components/ScreenHeader';
 import { ProgramOverviewCard } from '@/src/features/workouts/components/ProgramOverviewCard';
 import { WorkoutDaySection } from '@/src/features/workouts/components/WorkoutDaySection';
+import { useWorkoutsQuery } from '@/src/hooks/useWorkoutsQuery';
 import { useWorkoutStore } from '@/src/store/workout.store';
 
 const C = Colors.dark;
 
 export default function WorkoutsTab() {
-  const { currentTemplate, startDayWorkout, isLoading, fetchWorkouts } = useWorkoutStore();
+  const { startDayWorkout } = useWorkoutStore();
+  const { data, isLoading } = useWorkoutsQuery();
+  const currentTemplate = data?.currentTemplate;
   const router = useRouter();
-
-  useFocusEffect(
-    useCallback(() => {
-      fetchWorkouts();
-    }, [fetchWorkouts])
-  );
 
   const handleStartWorkout = (dayId: string) => {
     if (!currentTemplate) return;
-    startDayWorkout(currentTemplate.id, dayId);
+    const targetDay = currentTemplate.days.find((d) => d.id === dayId);
+    if (!targetDay) return;
+    startDayWorkout(currentTemplate.id, targetDay);
     router.push('/workouts/session');
   };
 

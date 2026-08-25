@@ -1,6 +1,6 @@
-import { useAuthStore } from '../store/auth.store';
-import { apiMultipartRequest } from './api';
 import { appendImageToFormData } from '../lib/image';
+import { useAuthStore } from '../store/auth.store';
+import { apiMultipartRequest, apiRequest } from './api';
 
 export class StorageService {
   /**
@@ -29,5 +29,26 @@ export class StorageService {
       console.error('Error uploading files:', error);
       throw error;
     }
+  }
+
+  /**
+   * Fetches a fresh signed URL for a given S3 key.
+   */
+  static async getSignedUrl(key: string): Promise<string> {
+    if (key.startsWith('http')) return key;
+
+    const token = useAuthStore.getState().token;
+    const result = await apiRequest<{ signedUrl: string }>(
+      `storage/signed-url?key=${encodeURIComponent(key)}`,
+      {
+        headers: token ? { Authorization: `Bearer ${token}` } : {},
+      },
+    );
+
+    if (result.error || !result.data?.signedUrl) {
+      throw new Error(result.error ?? 'Failed to fetch signed URL');
+    }
+
+    return result.data.signedUrl;
   }
 }

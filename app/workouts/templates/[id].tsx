@@ -2,16 +2,18 @@ import React from 'react';
 import { ScrollView, View, Text, StyleSheet } from 'react-native';
 import { useLocalSearchParams } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useWorkoutStore } from '@/src/store/workout.store';
 import { ProgramOverviewCard } from '@/src/features/workouts/components/ProgramOverviewCard';
 import { WorkoutDaySection } from '@/src/features/workouts/components/WorkoutDaySection';
+import { useWorkoutsQuery } from '@/src/hooks/useWorkoutsQuery';
 import { Colors, Spacing, Typography } from '@/constants/theme';
 
 const C = Colors.dark;
 
 export default function WorkoutTemplateDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
-  const { historyTemplates, currentTemplate } = useWorkoutStore();
+  const { data } = useWorkoutsQuery();
+  const historyTemplates = data?.historyTemplates || [];
+  const currentTemplate = data?.currentTemplate;
 
   const template =
     currentTemplate?.id === id

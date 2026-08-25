@@ -11,6 +11,8 @@ import { ExerciseMediaCard } from '@/src/features/workouts/components/ExerciseMe
 import { ExerciseInstructions } from '@/src/features/workouts/components/ExerciseInstructions';
 import { ExerciseSetLogger } from '@/src/features/workouts/components/ExerciseSetLogger';
 
+import { useWorkoutsQuery } from '@/src/hooks/useWorkoutsQuery';
+
 const C = Colors.dark;
 
 export default function ActiveExerciseScreen() {
@@ -18,8 +20,6 @@ export default function ActiveExerciseScreen() {
   const router = useRouter();
 
   const {
-    currentTemplate,
-    historyTemplates,
     activeTemplateId,
     activeDayId,
     activeExercisesState,
@@ -28,6 +28,10 @@ export default function ActiveExerciseScreen() {
     toggleSetCompleted,
     completeExercise,
   } = useWorkoutStore();
+
+  const { data } = useWorkoutsQuery();
+  const currentTemplate = data?.currentTemplate;
+  const historyTemplates = data?.historyTemplates || [];
 
   const template =
     currentTemplate?.id === activeTemplateId

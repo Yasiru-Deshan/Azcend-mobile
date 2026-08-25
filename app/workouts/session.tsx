@@ -9,6 +9,7 @@ import { useWorkoutStore } from '@/src/store/workout.store';
 import { SessionDetailCard } from '@/src/features/workouts/components/SessionDetailCard';
 import { SessionExerciseItem } from '@/src/features/workouts/components/SessionExerciseItem';
 import { CelebrationModal } from '@/src/features/workouts/components/CelebrationModal';
+import { useWorkoutsQuery } from '@/src/hooks/useWorkoutsQuery';
 
 const C = Colors.dark;
 
@@ -18,8 +19,6 @@ export default function WorkoutSessionScreen() {
   const [elapsed, setElapsed] = useState('0:00');
 
   const {
-    currentTemplate,
-    historyTemplates,
     activeTemplateId,
     activeDayId,
     activeExercisesState,
@@ -30,6 +29,10 @@ export default function WorkoutSessionScreen() {
     finishWorkout,
     resetWorkoutState,
   } = useWorkoutStore();
+
+  const { data } = useWorkoutsQuery();
+  const currentTemplate = data?.currentTemplate;
+  const historyTemplates = data?.historyTemplates || [];
 
   useEffect(() => {
     if (workoutCompleted && !workoutStarted) {

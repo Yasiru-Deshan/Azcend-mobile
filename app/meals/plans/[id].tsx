@@ -3,7 +3,7 @@ import { ScrollView, View, Text, StyleSheet } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useLocalSearchParams } from 'expo-router';
 
-import { useMealStore } from '@/src/store/meal.store';
+import { useMealPlansQuery } from '@/src/hooks/useMealPlansQuery';
 import { Colors, Spacing, Typography } from '@/constants/theme';
 
 import { PlanInfoHeader } from '@/src/features/meals/components/PlanInfoHeader';
@@ -15,7 +15,9 @@ const C = Colors.dark;
 
 export default function MealPlanDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
-  const { currentPlan, historyPlans } = useMealStore();
+  const { data } = useMealPlansQuery();
+  const currentPlan = data?.currentPlan;
+  const historyPlans = data?.historyPlans || [];
 
   const plan =
     currentPlan?.id === id

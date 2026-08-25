@@ -8,6 +8,7 @@ export interface User {
   email: string;
   name?: string;
   role?: string;
+  isCheckinSubmitted?: boolean;
 }
 
 export interface CoachInfo {
@@ -124,6 +125,12 @@ export const useAuthStore = create<AuthState>((set, get) => ({
         },
         coach: coachData,
       });
+
+      if (p.isCheckinSubmitted !== undefined) {
+        set((state) => ({
+          user: state.user ? { ...state.user, isCheckinSubmitted: p.isCheckinSubmitted } : null
+        }));
+      }
     } else {
       await logout();
     }
