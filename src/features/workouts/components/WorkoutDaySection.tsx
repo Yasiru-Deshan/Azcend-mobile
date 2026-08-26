@@ -10,12 +10,14 @@ interface WorkoutDaySectionProps {
   day: WorkoutDay;
   onStartWorkout?: () => void;
   defaultExpanded?: boolean;
+  showStartButton?: boolean;
 }
 
 export const WorkoutDaySection = ({
   day,
   onStartWorkout,
   defaultExpanded = false,
+  showStartButton = false,
 }: WorkoutDaySectionProps) => {
   const [expanded, setExpanded] = useState(defaultExpanded);
 
@@ -48,7 +50,7 @@ export const WorkoutDaySection = ({
             ))}
           </View>
 
-          {onStartWorkout && (
+          {showStartButton && (
             <TouchableOpacity
               style={styles.startButton}
               onPress={onStartWorkout}

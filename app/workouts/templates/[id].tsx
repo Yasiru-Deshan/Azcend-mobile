@@ -1,19 +1,24 @@
 import React from 'react';
 import { ScrollView, View, Text, StyleSheet } from 'react-native';
-import { useLocalSearchParams } from 'expo-router';
+import { useLocalSearchParams, useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { ProgramOverviewCard } from '@/src/features/workouts/components/ProgramOverviewCard';
 import { WorkoutDaySection } from '@/src/features/workouts/components/WorkoutDaySection';
 import { useWorkoutsQuery } from '@/src/hooks/useWorkoutsQuery';
+import { useWorkoutStore } from '@/src/store/workout.store';
 import { Colors, Spacing, Typography } from '@/constants/theme';
 
 const C = Colors.dark;
 
 export default function WorkoutTemplateDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
+  const router = useRouter();
   const { data } = useWorkoutsQuery();
   const historyTemplates = data?.historyTemplates || [];
   const currentTemplate = data?.currentTemplate;
+  const currentWorkoutDayId = data?.currentWorkoutDayId ?? null;
+
+  const startDayWorkout = useWorkoutStore((s) => s.startDayWorkout);
 
   const template =
     currentTemplate?.id === id
@@ -28,6 +33,8 @@ export default function WorkoutTemplateDetailScreen() {
     );
   }
 
+  const isCurrentTemplate = currentTemplate?.id === id;
+
   return (
     <SafeAreaView style={styles.safeArea} edges={['bottom', 'left', 'right']}>
       <ScrollView
@@ -40,13 +47,24 @@ export default function WorkoutTemplateDetailScreen() {
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Routine Breakdown</Text>
           <View style={styles.cardStack}>
-            {template.days.map((day) => (
-              <WorkoutDaySection
-                key={day.id}
-                day={day}
-                defaultExpanded={true}
-              />
-            ))}
+            {template.days.map((day) => {
+              const isCurrentDay = isCurrentTemplate && day.id === currentWorkoutDayId;
+              return (
+                <WorkoutDaySection
+                  key={day.id}
+                  day={day}
+                  defaultExpanded={isCurrentDay}
+                  onStartWorkout={
+                    isCurrentDay
+                      ? () => {
+                          startDayWorkout(template.id, day);
+                          router.push('/workouts/session');
+                        }
+                      : undefined
+                  }
+                />
+              );
+            })}
           </View>
         </View>
       </ScrollView>

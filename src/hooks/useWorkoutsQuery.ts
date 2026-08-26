@@ -9,7 +9,7 @@ export function useWorkoutsQuery() {
   return useQuery({
     queryKey: ['workouts', user?.id],
     queryFn: async () => {
-      if (!token || !user?.id) return { currentTemplate: null, historyTemplates: [] };
+      if (!token || !user?.id) return { currentTemplate: null, currentWorkoutDayId: null, historyTemplates: [] };
 
       const [currentRes, historyRes] = await Promise.all([
         fetchCurrentWorkoutTemplateApi(token, user.id),
@@ -17,6 +17,7 @@ export function useWorkoutsQuery() {
       ]);
 
       const currentTemplate: WorkoutTemplate | null = currentRes.data?.workoutTemplate || null;
+      const currentWorkoutDayId = currentRes.data?.currentWorkoutDayId ?? null;
       const allAssigned: WorkoutTemplate[] = Array.isArray(historyRes.data)
         ? historyRes.data.map((assignment: any) => assignment.workoutTemplate).filter(Boolean)
         : [];
@@ -27,10 +28,11 @@ export function useWorkoutsQuery() {
 
       return {
         currentTemplate,
+        currentWorkoutDayId,
         historyTemplates,
       };
     },
     enabled: !!token && !!user?.id,
-    staleTime: 1000 * 60 * 5,
+    staleTime: 0,
   });
 }

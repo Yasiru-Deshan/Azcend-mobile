@@ -1,6 +1,6 @@
-import { useRouter } from 'expo-router';
+import { useFocusEffect, useRouter } from 'expo-router';
 import { History } from 'lucide-react-native';
-import React from 'react';
+import React, { useCallback } from 'react';
 import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
@@ -9,7 +9,9 @@ import { ScreenHeader } from '@/src/components/ScreenHeader';
 import { ProgramOverviewCard } from '@/src/features/workouts/components/ProgramOverviewCard';
 import { WorkoutDaySection } from '@/src/features/workouts/components/WorkoutDaySection';
 import { useWorkoutsQuery } from '@/src/hooks/useWorkoutsQuery';
+import { useAuthStore } from '@/src/store/auth.store';
 import { useWorkoutStore } from '@/src/store/workout.store';
+import { useQueryClient } from '@tanstack/react-query';
 
 const C = Colors.dark;
 
@@ -17,7 +19,17 @@ export default function WorkoutsTab() {
   const { startDayWorkout } = useWorkoutStore();
   const { data, isLoading } = useWorkoutsQuery();
   const currentTemplate = data?.currentTemplate;
+  const currentWorkoutDayId = data?.currentWorkoutDayId ?? null;
+
   const router = useRouter();
+  const queryClient = useQueryClient();
+  const { user } = useAuthStore();
+
+  useFocusEffect(
+    useCallback(() => {
+      queryClient.invalidateQueries({ queryKey: ['workouts', user?.id] });
+    }, [queryClient, user?.id])
+  );
 
   const handleStartWorkout = (dayId: string) => {
     if (!currentTemplate) return;
@@ -63,12 +75,17 @@ export default function WorkoutsTab() {
             <View style={styles.section}>
               <Text style={styles.sectionTitle}>Weekly Schedule</Text>
               <View style={styles.cardStack}>
-                {currentTemplate.days.map((day, index) => (
+                {currentTemplate.days.map((day) => (
                   <WorkoutDaySection
                     key={day.id}
                     day={day}
-                    defaultExpanded={index === 0}
-                    onStartWorkout={() => handleStartWorkout(day.id)}
+                    defaultExpanded={day.id === currentWorkoutDayId}
+                    showStartButton={day.id === currentWorkoutDayId}
+                    onStartWorkout={
+                      day.id === currentWorkoutDayId
+                        ? () => handleStartWorkout(day.id)
+                        : undefined
+                    }
                   />
                 ))}
               </View>
